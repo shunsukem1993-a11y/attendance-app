@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('proposal_breaks', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->string('email', 255)->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password', 255);
-            $table->rememberToken();
-            $table->boolean('admin_status')->default(false);
+            $table->foreignId('attendance_correction_request_id')
+                ->constrained('attendance_correction_requests')
+                ->cascadeOnDelete();
+            $table->time('break_in');
+            $table->time('break_out');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('proposal_breaks');
     }
 };
