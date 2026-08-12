@@ -6,9 +6,18 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class RegisterController extends Controller
 {
+    /**
+     * 会員登録画面を表示する
+     */
+    public function create(): View
+    {
+        return view('user.register');
+    }
+
     /**
      * 一般ユーザーを登録する
      */
