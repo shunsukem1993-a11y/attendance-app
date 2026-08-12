@@ -20,6 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// 会員登録画面
+Route::get('/register', [RegisterController::class, 'create'])
+    ->name('register');
+
 // 会員登録処理
 Route::post('/register', [RegisterController::class, 'store'])
     ->name('register.store');
