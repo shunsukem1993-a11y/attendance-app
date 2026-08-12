@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class AttendanceCorrectionRequest extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'attendance_record_id',
+        'approval_status',
+        'comment',
+        'new_date',
+        'new_clock_in',
+        'new_clock_out',
+    ];
+
+    // user_idを外部キーとしてUserモデルとのリレーションを定義
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+    public function attendanceRecord(): BelongsTo
+    {
+        return $this->belongsTo(AttendanceRecord::class);
+    }
+
+    // 修正申請に紐づく申請休憩情報とのリレーションを定義
+    public function proposalBreaks(): HasMany
+    {
+        return $this->hasMany(ProposalBreak::class);
+    }
+}

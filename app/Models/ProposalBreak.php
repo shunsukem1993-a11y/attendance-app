@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class ProposalBreak extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'attendance_correction_request_id',
+        'break_in',
+        'break_out',
+    ];
+
+    // attendance_correction_request_idを外部キーとして
+    // AttendanceCorrectionRequestモデルとのリレーションを定義
+    public function attendanceCorrectionRequest(): BelongsTo
+    {
+        return $this->belongsTo(AttendanceCorrectionRequest::class);
+    }
+}
