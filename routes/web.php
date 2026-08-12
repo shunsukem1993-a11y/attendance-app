@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +17,25 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::middleware('auth')->group(function () {
+
+    // 仮の勤怠登録画面
+    Route::get('/attendance', function () {
+        $user = Auth::user();
+
+        $formattedDate = Carbon::now()->format('Y年m月d日');
+        $formattedTime = Carbon::now()->format('H:i');
+
+        // 仮の勤怠状態
+        $user->attendance_status = '勤務外';
+
+        return view('user.attendance-register', compact(
+            'user',
+            'formattedDate',
+            'formattedTime'
+        ));
+    })->name('attendance.index');
+
 });
