@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// 会員登録処理
+Route::post('/register', [RegisterController::class, 'store'])
+    ->name('register.store');
+
 Route::middleware('auth')->group(function () {
 
     // 仮の勤怠登録画面
@@ -37,5 +42,4 @@ Route::middleware('auth')->group(function () {
             'formattedTime'
         ));
     })->name('attendance.index');
-
 });
