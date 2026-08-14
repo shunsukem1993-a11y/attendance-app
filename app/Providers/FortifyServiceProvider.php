@@ -27,7 +27,16 @@ class FortifyServiceProvider extends ServiceProvider
             {
                 public function toResponse($request)
                 {
-                    return redirect('/login');
+                    $isAdmin = $request->attributes->get(
+                        'is_admin_logout',
+                        false
+                    );
+
+                    if ($isAdmin) {
+                        return redirect()->route('admin.login');
+                    }
+
+                    return redirect()->route('login');
                 }
             };
         });
