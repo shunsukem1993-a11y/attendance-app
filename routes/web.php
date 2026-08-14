@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminLoginController;
+use App\Http\Controllers\AdminLogoutController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
@@ -45,6 +46,11 @@ Route::get('/admin/login', [AdminLoginController::class, 'create'])
 // 管理者ログイン処理
 Route::post('/admin/login', [AdminLoginController::class, 'store'])
     ->name('admin.login.store');
+
+// 管理者ログアウト処理
+Route::post('/admin/logout', [AdminLogoutController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('admin.logout');
 
 Route::middleware('auth')->group(function () {
 
