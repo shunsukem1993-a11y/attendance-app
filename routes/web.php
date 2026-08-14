@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,14 @@ Route::get('/register', [RegisterController::class, 'create'])
 // 会員登録処理
 Route::post('/register', [RegisterController::class, 'store'])
     ->name('register.store');
+
+// ログイン画面
+Route::get('/login', [LoginController::class, 'create'])
+    ->name('login');
+
+// ログイン処理
+Route::post('/login', [LoginController::class, 'store'])
+    ->name('login.store');
 
 Route::middleware('auth')->group(function () {
 
