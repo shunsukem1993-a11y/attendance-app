@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
@@ -29,13 +30,21 @@ Route::get('/register', [RegisterController::class, 'create'])
 Route::post('/register', [RegisterController::class, 'store'])
     ->name('register.store');
 
-// ログイン画面
+// 一般ユーザーログイン画面
 Route::get('/login', [LoginController::class, 'create'])
     ->name('login');
 
-// ログイン処理
+// 一般ユーザーログイン処理
 Route::post('/login', [LoginController::class, 'store'])
     ->name('login.store');
+
+// 管理者ログイン画面
+Route::get('/admin/login', [AdminLoginController::class, 'create'])
+    ->name('admin.login');
+
+// 管理者ログイン処理
+Route::post('/admin/login', [AdminLoginController::class, 'store'])
+    ->name('admin.login.store');
 
 Route::middleware('auth')->group(function () {
 
@@ -55,4 +64,23 @@ Route::middleware('auth')->group(function () {
             'formattedTime'
         ));
     })->name('attendance.index');
+
+    // 仮の管理者勤怠一覧画面
+    Route::get('/admin/attendance/list', function () {
+        $date = Carbon::today();
+
+        $previousDay = $date->copy()->subDay()->format('Y-m-d');
+        $nextDay = $date->copy()->addDay()->format('Y-m-d');
+
+        $users = collect();
+        $attendanceRecords = collect();
+
+        return view('admin.admin-attendance-list', compact(
+            'date',
+            'previousDay',
+            'nextDay',
+            'users',
+            'attendanceRecords'
+        ));
+    })->name('admin.attendance.list');
 });
