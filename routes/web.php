@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLogoutController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,26 +52,26 @@ Route::post('/admin/logout', [AdminLogoutController::class, 'destroy'])
     ->middleware('auth')
     ->name('admin.logout');
 
+// 一般ユーザー
 Route::middleware('auth')->group(function () {
 
-    // 仮の勤怠登録画面
-    Route::get('/attendance', function () {
-        $user = Auth::user();
+    // 勤怠登録画面
+    Route::get('/attendance', [AttendanceController::class, 'create'])
+        ->name('attendance.create');
 
-        $formattedDate = Carbon::now()->format('Y年m月d日');
-        $formattedTime = Carbon::now()->format('H:i');
+    // 勤怠打刻処理
+    Route::post('/attendance', [AttendanceController::class, 'store'])
+        ->name('attendance.store');
+});
 
-        // 仮の勤怠状態
-        $user->attendance_status = '勤務外';
+// 管理者
+Route::middleware(['auth', 'admin'])->group(function () {
 
-        return view('user.attendance-register', compact(
-            'user',
-            'formattedDate',
-            'formattedTime'
-        ));
-    })->name('attendance.index');
+    // 管理者ログアウト処理
+    Route::post('/admin/logout', [AdminLogoutController::class, 'destroy'])
+        ->name('admin.logout');
 
-    // 仮の管理者勤怠一覧画面
+    // 管理者勤怠一覧画面
     Route::get('/admin/attendance/list', function () {
         $date = Carbon::today();
 
