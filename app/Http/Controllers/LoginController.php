@@ -34,6 +34,6 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('attendance.index');
+        return redirect()->route('attendance.create');
     }
 }
