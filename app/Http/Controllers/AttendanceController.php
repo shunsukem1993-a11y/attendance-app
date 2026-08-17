@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AttendanceListService;
 use App\Services\AttendanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -9,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class AttendanceController extends Controller
 {
     public function __construct(
-        private AttendanceService $attendanceService
+        private AttendanceService $attendanceService,
+        private AttendanceListService $attendanceListService
     ) {}
 
     /**
@@ -57,5 +59,32 @@ class AttendanceController extends Controller
         }
 
         return redirect()->route('attendance.create');
+    }
+
+    /**
+     * 勤怠一覧画面を表示する。
+     */
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        $date = $request->filled('date')
+            ? now()->createFromFormat('Y-m', $request->input('date'))
+            : now()->startOfMonth();
+
+        $formattedAttendanceRecords = $this->attendanceListService->getMonthlyRecords(
+            $user,
+            $date
+        );
+
+        $previousMonth = $date->copy()->subMonth()->format('Y-m');
+        $nextMonth = $date->copy()->addMonth()->format('Y-m');
+
+        return view('user.user-attendance-list', compact(
+            'date',
+            'previousMonth',
+            'nextMonth',
+            'formattedAttendanceRecords'
+        ));
     }
 }
