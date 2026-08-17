@@ -41,6 +41,10 @@ Route::middleware('auth')->group(function () {
     // 勤怠打刻処理
     Route::post('/attendance', [AttendanceController::class, 'store'])
         ->name('attendance.store');
+
+    // 勤怠一覧画面
+    Route::get('/attendance/list', [AttendanceController::class, 'index'])
+        ->name('attendance.list');
 });
 
 // 管理者ログイン画面
