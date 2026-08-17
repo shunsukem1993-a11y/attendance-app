@@ -23,34 +23,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// 会員登録画面
-Route::get('/register', [RegisterController::class, 'create'])
-    ->name('register');
-
 // 会員登録処理
 Route::post('/register', [RegisterController::class, 'store'])
     ->name('register.store');
 
-// 一般ユーザーログイン画面
-Route::get('/login', [LoginController::class, 'create'])
-    ->name('login');
-
 // 一般ユーザーログイン処理
 Route::post('/login', [LoginController::class, 'store'])
     ->name('login.store');
-
-// 管理者ログイン画面
-Route::get('/admin/login', [AdminLoginController::class, 'create'])
-    ->name('admin.login');
-
-// 管理者ログイン処理
-Route::post('/admin/login', [AdminLoginController::class, 'store'])
-    ->name('admin.login.store');
-
-// 管理者ログアウト処理
-Route::post('/admin/logout', [AdminLogoutController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('admin.logout');
 
 // 一般ユーザー
 Route::middleware('auth')->group(function () {
@@ -63,6 +42,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/attendance', [AttendanceController::class, 'store'])
         ->name('attendance.store');
 });
+
+// 管理者ログイン画面
+Route::get('/admin/login', [AdminLoginController::class, 'create'])
+    ->name('admin.login');
 
 // 管理者
 Route::middleware(['auth', 'admin'])->group(function () {
