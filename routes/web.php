@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLogoutController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceCorrectionRequestController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Carbon\Carbon;
@@ -45,6 +46,16 @@ Route::middleware('auth')->group(function () {
     // 勤怠一覧画面
     Route::get('/attendance/list', [AttendanceController::class, 'index'])
         ->name('attendance.list');
+
+    // 勤怠詳細画面
+    Route::get('/attendance/{id}', [AttendanceController::class, 'show'])
+        ->name('attendance.detail');
+
+    // 勤怠修正申請処理
+    Route::post(
+        '/attendance/{id}',
+        [AttendanceCorrectionRequestController::class, 'store']
+    )->name('attendance.correction.store');
 });
 
 // 管理者ログイン画面

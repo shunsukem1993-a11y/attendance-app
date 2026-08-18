@@ -11,6 +11,10 @@ class AttendanceCorrectionRequest extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_APPROVED = 1;
+
     protected $fillable = [
         'user_id',
         'attendance_record_id',
