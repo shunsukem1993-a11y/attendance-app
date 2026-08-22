@@ -56,6 +56,18 @@ Route::middleware('auth')->group(function () {
         '/attendance/{id}',
         [AttendanceCorrectionRequestController::class, 'store']
     )->name('attendance.correction.store');
+
+    // 勤怠修正申請一覧画面
+    Route::get(
+        '/stamp_correction_request/list',
+        [AttendanceCorrectionRequestController::class, 'index']
+    )->name('attendance.correction.index');
+
+    // 勤怠修正申請詳細画面
+    Route::get(
+        '/application/{id}',
+        [AttendanceCorrectionRequestController::class, 'show']
+    )->name('attendance.correction.show');
 });
 
 // 管理者ログイン画面
