@@ -48,12 +48,12 @@ Route::middleware('auth')->group(function () {
         ->name('attendance.list');
 
     // 勤怠詳細画面
-    Route::get('/attendance/{id}', [AttendanceController::class, 'show'])
+    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'show'])
         ->name('attendance.detail');
 
     // 勤怠修正申請処理
     Route::post(
-        '/attendance/{id}',
+        '/attendance/detail/{id}',
         [AttendanceCorrectionRequestController::class, 'store']
     )->name('attendance.correction.store');
 
@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
 
     // 勤怠修正申請詳細画面
     Route::get(
-        '/application/{id}',
+        '/application/detail/{id}',
         [AttendanceCorrectionRequestController::class, 'show']
     )->name('attendance.correction.show');
 });
