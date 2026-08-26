@@ -94,4 +94,32 @@ class AdminLoginTest extends TestCase
 
         $this->assertAuthenticatedAs($admin);
     }
+
+    /**
+     * 管理者がログアウトできる
+     */
+    public function test_admin_can_logout(): void
+    {
+        $admin = User::factory()->create([
+            'admin_status' => true,
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->post('/admin/logout');
+
+        $response->assertRedirect('/admin/login');
+
+        $this->assertGuest();
+    }
+
+    /**
+     * 未認証ユーザーは管理画面にアクセスできない
+     */
+    public function test_guest_cannot_access_admin_attendance(): void
+    {
+        $response = $this->get('/admin/attendance/list');
+
+        $response->assertRedirect('/admin/login');
+    }
 }

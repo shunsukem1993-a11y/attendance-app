@@ -95,6 +95,23 @@ class RegisterTest extends TestCase
     }
 
     /**
+     * メールアドレスがメール形式ではない場合、バリデーションエラーになる
+     */
+    public function test_email_must_be_valid_format(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'テストユーザー',
+            'email' => 'invalid-email',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors([
+            'email' => 'メールアドレスはメール形式で入力してください',
+        ]);
+    }
+
+    /**
      * 正しい入力の場合、ユーザーが正常に登録される
      */
     public function test_user_can_register(): void
@@ -115,5 +132,17 @@ class RegisterTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
+    }
+
+    /**
+     * 会員登録画面からログイン画面へ遷移できる
+     */
+    public function test_register_page_has_login_link(): void
+    {
+        $response = $this->get('/register');
+
+        $response->assertStatus(200);
+        $response->assertSee('ログイン');
+        $response->assertSee('/login');
     }
 }
