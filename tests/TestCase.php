@@ -25,4 +25,18 @@ abstract class TestCase extends BaseTestCase
 
         return [$user, $attendanceRecord];
     }
+
+    /**
+     * 管理者ユーザーを作成してログインする。
+     */
+    protected function createAdminUser(): User
+    {
+        $admin = User::factory()->create([
+            'admin_status' => true,
+        ]);
+
+        $this->actingAs($admin);
+
+        return $admin;
+    }
 }
