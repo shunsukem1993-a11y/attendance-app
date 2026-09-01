@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminLogoutController;
 use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionRequestController;
+use App\Http\Controllers\AttendanceCorrectionRequestListController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
@@ -61,8 +62,10 @@ Route::middleware('auth')->group(function () {
     // 勤怠修正申請一覧画面
     Route::get(
         '/stamp_correction_request/list',
-        [AttendanceCorrectionRequestController::class, 'index']
-    )->name('attendance.correction.index');
+        [AttendanceCorrectionRequestListController::class, 'index']
+    )
+        ->middleware('correction.request.role')
+        ->name('attendance.correction.index');
 
     // 勤怠修正申請詳細画面
     Route::get(
