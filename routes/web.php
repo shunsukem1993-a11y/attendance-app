@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminAttendanceController;
+use App\Http\Controllers\AdminAttendanceCorrectionRequestController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLogoutController;
 use App\Http\Controllers\AdminStaffController;
@@ -118,4 +119,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
         '/admin/attendance/staff/{id}',
         [AdminAttendanceController::class, 'staff']
     )->name('admin.attendance.staff');
+
+    // 管理者勤怠修正申請詳細画面
+    Route::get(
+        '/stamp_correction_request/approve/{id}',
+        [AdminAttendanceCorrectionRequestController::class, 'show']
+    )->name('admin.attendance.correction.show');
+
+    // 管理者勤怠修正申請承認処理
+    Route::post(
+        '/stamp_correction_request/approve/{id}',
+        [AdminAttendanceCorrectionRequestController::class, 'approve']
+    )->name('admin.attendance.correction.approve');
 });

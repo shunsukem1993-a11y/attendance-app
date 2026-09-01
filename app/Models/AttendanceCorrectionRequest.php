@@ -25,6 +25,10 @@ class AttendanceCorrectionRequest extends Model
         'new_clock_out',
     ];
 
+    protected $casts = [
+        'new_date' => 'date',
+    ];
+
     // user_idを外部キーとしてUserモデルとのリレーションを定義
     public function user(): BelongsTo
     {
