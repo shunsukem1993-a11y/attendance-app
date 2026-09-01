@@ -69,6 +69,7 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
+        $loginUser = Auth::user();
         $user = Auth::user();
 
         $date = $request->filled('date')
@@ -96,7 +97,8 @@ class AttendanceController extends Controller
      */
     public function show(int $id)
     {
-        $user = Auth::user();
+        $loginUser = Auth::user();
+        $user = $loginUser;
 
         $attendanceRecord = AttendanceRecord::with([
             'breaks',
@@ -137,6 +139,7 @@ class AttendanceController extends Controller
 
         return view('user.user-detail', compact(
             'user',
+            'loginUser',
             'data'
         ));
     }

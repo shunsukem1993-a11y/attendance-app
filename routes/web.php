@@ -90,4 +90,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
         '/admin/attendance/list',
         [AdminAttendanceController::class, 'index']
     )->name('admin.attendance.list');
+
+    // 管理者勤怠詳細
+    Route::get(
+        '/admin/attendance/detail/{id}',
+        [AdminAttendanceController::class, 'show']
+    )->name('admin.attendance.detail');
+
+    // 管理者勤怠修正
+    Route::post(
+        '/admin/attendance/detail/{id}',
+        [AdminAttendanceController::class, 'update']
+    )->name('admin.attendance.update');
 });

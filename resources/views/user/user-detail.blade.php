@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(Auth::user()->admin_status ? 'layouts.admin-app' : 'layouts.app')
 
 @section('css')
     @vite('resources/css/user/user-detail.css')
@@ -9,7 +9,13 @@
         <div class="detail__header">
             <h1 class="content__header--item">勤怠詳細</h1>
         </div>
-        <form class="form" action="{{ url('/attendance/detail/' . $data['id']) }}" method="post">
+        <form
+            class="form"
+            action="{{ $loginUser->admin_status
+                ? route('admin.attendance.update', $data['id'])
+                : route('attendance.correction.store', $data['id']) }}"
+            method="post"
+        >
             @csrf
 
             @if (is_null($data['application']))
