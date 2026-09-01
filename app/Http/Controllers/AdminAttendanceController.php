@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AttendanceCorrectionRequest as AttendanceCorrectionRequestForm;
 use App\Models\AttendanceCorrectionRequest;
 use App\Models\AttendanceRecord;
+use App\Models\User;
 use App\Services\AdminAttendanceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -139,5 +140,39 @@ class AdminAttendanceController extends Controller
         return redirect()
             ->route('admin.attendance.detail', $id)
             ->with('success', '勤怠を修正しました。');
+    }
+
+    /**
+     * スタッフ別月次勤怠一覧画面を表示する。
+     */
+    public function staff(Request $request, int $id)
+    {
+        $user = User::findOrFail($id);
+
+        $date = $request->filled('date')
+            ? Carbon::createFromFormat('Y-m', $request->input('date'))
+            : now()->startOfMonth();
+
+        $formattedAttendanceRecords =
+            $this->adminAttendanceService->getStaffMonthlyRecords(
+                $user,
+                $date
+            );
+
+        $previousMonth = $date->copy()
+            ->subMonth()
+            ->format('Y-m');
+
+        $nextMonth = $date->copy()
+            ->addMonth()
+            ->format('Y-m');
+
+        return view('admin.staff-attendance-list', compact(
+            'user',
+            'date',
+            'previousMonth',
+            'nextMonth',
+            'formattedAttendanceRecords'
+        ));
     }
 }

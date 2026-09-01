@@ -109,4 +109,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         '/admin/staff/list',
         [AdminStaffController::class, 'index']
     )->name('admin.staff.list');
+
+    // スタッフ別月次勤怠一覧
+    Route::get(
+        '/admin/attendance/staff/{id}',
+        [AdminAttendanceController::class, 'staff']
+    )->name('admin.attendance.staff');
 });

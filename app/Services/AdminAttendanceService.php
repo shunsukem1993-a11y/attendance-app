@@ -95,4 +95,68 @@ class AdminAttendanceService
 
         return gmdate('H:i:s', $workSeconds);
     }
+
+    /**
+     * 指定ユーザーの月次勤怠記録を取得する。
+     */
+    public function getStaffMonthlyRecords(
+        User $user,
+        Carbon $date
+    ): Collection {
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
+
+        $attendanceRecords = AttendanceRecord::with('breaks')
+            ->where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startOfMonth->toDateString(),
+                $endOfMonth->toDateString(),
+            ])
+            ->get()
+            ->keyBy(function ($attendanceRecord) {
+                return Carbon::parse($attendanceRecord->date)
+                    ->format('Y-m-d');
+            });
+
+        $formattedRecords = collect();
+
+        for (
+            $currentDate = $startOfMonth->copy();
+            $currentDate->lte($endOfMonth);
+            $currentDate->addDay()
+        ) {
+            $attendanceRecord = $attendanceRecords->get(
+                $currentDate->format('Y-m-d')
+            );
+
+            if ($attendanceRecord) {
+                $totalBreakTime = $this->calculateTotalBreakTime(
+                    $attendanceRecord
+                );
+
+                $totalWorkTime = $this->calculateTotalWorkTime(
+                    $attendanceRecord,
+                    $totalBreakTime
+                );
+
+                $attendanceRecord->total_break_time = $totalBreakTime;
+                $attendanceRecord->total_time = $totalWorkTime;
+            }
+
+            $formattedRecords->push([
+                'id' => $attendanceRecord?->id,
+                'date' => $currentDate->format('m/d'),
+                'clock_in' => $attendanceRecord?->clock_in
+                    ? Carbon::parse($attendanceRecord->clock_in)->format('H:i')
+                    : '',
+                'clock_out' => $attendanceRecord?->clock_out
+                    ? Carbon::parse($attendanceRecord->clock_out)->format('H:i')
+                    : '',
+                'total_break_time' => $attendanceRecord?->total_break_time,
+                'total_time' => $attendanceRecord?->total_time,
+            ]);
+        }
+
+        return $formattedRecords;
+    }
 }
