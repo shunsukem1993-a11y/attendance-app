@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AttendanceBreak;
 use App\Models\AttendanceCorrectionRequest;
 use Illuminate\Support\Collection;
 
@@ -41,5 +42,55 @@ class AdminAttendanceCorrectionRequestService
             $application->created_at->format('Y/m/d');
 
         return $application;
+    }
+
+    /**
+     * 指定された勤怠修正申請の詳細を取得する。
+     */
+    public function getApplication(int $id): AttendanceCorrectionRequest
+    {
+        return AttendanceCorrectionRequest::with([
+            'user',
+            'attendanceRecord',
+            'proposalBreaks',
+        ])->findOrFail($id);
+    }
+
+    /**
+     * 勤怠修正申請を承認する。
+     */
+    public function approve(int $id): void
+    {
+        $application = AttendanceCorrectionRequest::with([
+            'attendanceRecord',
+            'proposalBreaks',
+        ])->findOrFail($id);
+
+        $attendanceRecord = $application->attendanceRecord;
+
+        // 勤怠情報を申請内容で更新
+        $attendanceRecord->update([
+            'date' => $application->new_date,
+            'clock_in' => $application->new_clock_in,
+            'clock_out' => $application->new_clock_out,
+            'comment' => $application->comment,
+        ]);
+
+        // 既存の休憩情報を削除
+        $attendanceRecord->breaks()->delete();
+
+        // 申請された休憩情報を勤怠に反映
+        foreach ($application->proposalBreaks as $proposalBreak) {
+            AttendanceBreak::create([
+                'attendance_record_id' => $attendanceRecord->id,
+                'break_in' => $proposalBreak->break_in,
+                'break_out' => $proposalBreak->break_out,
+            ]);
+        }
+
+        // 申請を承認済みに変更
+        $application->update([
+            'approval_status' => AttendanceCorrectionRequest::STATUS_APPROVED,
+        ]);
     }
 }
