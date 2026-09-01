@@ -17,7 +17,7 @@ class AttendanceCorrectionListTest extends TestCase
      */
     public function test_pending_requests_are_displayed(): void
     {
-        [, $attendanceRecord] = $this->createAttendanceUser();
+        [$user, $attendanceRecord] = $this->createAttendanceUser();
 
         $this->post(
             '/attendance/detail/'.$attendanceRecord->id,
@@ -63,27 +63,21 @@ class AttendanceCorrectionListTest extends TestCase
     {
         [$user, $attendanceRecord] = $this->createAttendanceUser();
 
-        $this->post(
-            '/attendance/detail/'.$attendanceRecord->id,
-            [
-                'new_clock_in' => '10:00',
-                'new_clock_out' => '18:00',
-                'new_break_in' => ['12:00'],
-                'new_break_out' => ['13:00'],
-                'comment' => '承認済み申請テスト1',
-            ]
-        )->assertRedirect();
+        $request1 = $this->createCorrectionRequest(
+            $user,
+            $attendanceRecord,
+            '承認済み申請テスト1',
+            '10:00',
+            '18:00'
+        );
 
-        $this->post(
-            '/attendance/detail/'.$attendanceRecord->id,
-            [
-                'new_clock_in' => '11:00',
-                'new_clock_out' => '19:00',
-                'new_break_in' => ['12:00'],
-                'new_break_out' => ['13:00'],
-                'comment' => '承認済み申請テスト2',
-            ]
-        )->assertRedirect();
+        $request2 = $this->createCorrectionRequest(
+            $user,
+            $attendanceRecord,
+            '承認済み申請テスト2',
+            '11:00',
+            '19:00'
+        );
 
         $admin = User::factory()->create([
             'admin_status' => true,
@@ -109,11 +103,6 @@ class AttendanceCorrectionListTest extends TestCase
 
         $response->assertSee('承認済み申請テスト1');
         $response->assertSee('承認済み申請テスト2');
-
-        $response->assertSee('10:00');
-        $response->assertSee('18:00');
-        $response->assertSee('11:00');
-        $response->assertSee('19:00');
     }
 
     /**

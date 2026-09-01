@@ -26,6 +26,7 @@ class AttendanceCorrectionRequestController extends Controller
         ) {
             return [
                 'id' => $application->id,
+                'attendance_record_id' => $application->attendance_record_id,
                 'approval_status' => $application->approval_status === AttendanceCorrectionRequest::STATUS_PENDING
                     ? '承認待ち'
                     : '承認済み',
