@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AdminLogoutController;
+use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionRequestController;
 use App\Http\Controllers\LoginController;
@@ -102,4 +103,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         '/admin/attendance/detail/{id}',
         [AdminAttendanceController::class, 'update']
     )->name('admin.attendance.update');
+
+    // 管理者スタッフ一覧画面
+    Route::get(
+        '/admin/staff/list',
+        [AdminStaffController::class, 'index']
+    )->name('admin.staff.list');
 });
