@@ -73,7 +73,7 @@ class AttendanceCorrectionRequest extends FormRequest
             if ($clockIn && $clockOut && $clockIn > $clockOut) {
                 $validator->errors()->add(
                     'new_clock_in',
-                    '出勤時間もしくは退勤時間が不適切な値です'
+                    '出勤時間もしくは退勤時間が不適切な値です。'
                 );
             }
 
@@ -110,7 +110,7 @@ class AttendanceCorrectionRequest extends FormRequest
                 ) {
                     $validator->errors()->add(
                         "new_break_in.$index",
-                        '休憩時間が不適切な値です'
+                        '休憩時間が不適切な値です。'
                     );
                 }
 
@@ -120,7 +120,7 @@ class AttendanceCorrectionRequest extends FormRequest
                 if ($breakOut && $clockOut && $breakOut > $clockOut) {
                     $validator->errors()->add(
                         "new_break_out.$index",
-                        '休憩時間もしくは退勤時間が不適切な値です'
+                        '休憩時間もしくは退勤時間が不適切な値です。'
                     );
                 }
 
@@ -130,7 +130,7 @@ class AttendanceCorrectionRequest extends FormRequest
                 if ($breakIn && $breakOut && $breakOut < $breakIn) {
                     $validator->errors()->add(
                         "new_break_out.$index",
-                        '休憩時間が不適切な値です'
+                        '休憩時間が不適切な値です。'
                     );
                 }
             }
