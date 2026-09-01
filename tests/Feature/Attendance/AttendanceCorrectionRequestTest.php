@@ -66,9 +66,9 @@ class AttendanceCorrectionRequestTest extends TestCase
     }
 
     /**
-     * 申請の詳細から勤怠詳細画面へ遷移できる
+     * 申請一覧から申請詳細へ遷移できる
      */
-    public function test_can_navigate_to_attendance_detail_from_request(): void
+    public function test_can_navigate_to_application_detail_from_request(): void
     {
         [, $attendanceRecord] = $this->createAttendanceUser();
 
