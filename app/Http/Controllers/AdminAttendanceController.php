@@ -104,11 +104,11 @@ class AdminAttendanceController extends Controller
             'comment' => $attendanceRecord->comment ?? '',
         ];
 
-        return view('user.user-detail', compact(
-            'user',
-            'loginUser',
-            'data'
-        ));
+        return view('admin.admin-detail', [
+            'user' => $user,
+            'loginUser' => $loginUser,
+            'attendanceRecord' => $data,
+        ]);
     }
 
     /**
