@@ -6,17 +6,55 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AttendanceCorrectionRequest extends FormRequest
 {
-    /**
-     * リクエストの認可を行う。
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * バリデーションルールを定義する。
+     /**
+     * バリデーション前に時刻を正規化する
      */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'new_clock_in' => $this->normalizeTime(
+                $this->input('new_clock_in')
+            ),
+            'new_clock_out' => $this->normalizeTime(
+                $this->input('new_clock_out')
+            ),
+            'new_break_in' => $this->normalizeTimes(
+                $this->input('new_break_in', [])
+            ),
+            'new_break_out' => $this->normalizeTimes(
+                $this->input('new_break_out', [])
+            ),
+        ]);
+    }
+
+    private function normalizeTime(?string $time): ?string
+    {
+        if (! $time) {
+            return $time;
+        }
+
+        if (! preg_match('/^\d{1,2}:\d{1,2}$/', $time)) {
+            return $time;
+        }
+
+        [$hour, $minute] = explode(':', $time);
+
+        return sprintf('%02d:%02d', $hour, $minute);
+    }
+
+    private function normalizeTimes(array $times): array
+    {
+        return array_map(
+            fn ($time) => $this->normalizeTime($time),
+            $times
+        );
+    }
+
     public function rules(): array
     {
         return [
@@ -58,9 +96,6 @@ class AttendanceCorrectionRequest extends FormRequest
         ];
     }
 
-    /**
-     * バリデーション後の追加チェックを行う。
-     */
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
