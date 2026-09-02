@@ -29,19 +29,25 @@ class AttendanceCorrectionRequest extends Model
         'new_date' => 'date',
     ];
 
-    // user_idを外部キーとしてUserモデルとのリレーションを定義
+    /**
+     * user_idを外部キーとしてUserモデルとのリレーションを定義
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+    /**
+     * attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+     */
     public function attendanceRecord(): BelongsTo
     {
         return $this->belongsTo(AttendanceRecord::class);
     }
 
-    // 修正申請に紐づく申請休憩情報とのリレーションを定義
+    /**
+     * 修正申請に紐づく申請休憩情報とのリレーションを定義
+     */
     public function proposalBreaks(): HasMany
     {
         return $this->hasMany(ProposalBreak::class);

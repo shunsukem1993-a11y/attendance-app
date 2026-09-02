@@ -19,19 +19,25 @@ class AttendanceRecord extends Model
         'comment',
     ];
 
-    // user_idを外部キーとしてUserモデルとのリレーションを定義
+    /**
+     * user_idを外部キーとしてUserモデルとのリレーションを定義
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // attendance_record_idを外部キーとしてBreakモデルとのリレーションを定義
+    /**
+     * attendance_record_idを外部キーとしてBreakモデルとのリレーションを定義
+     */
     public function breaks(): HasMany
     {
         return $this->hasMany(AttendanceBreak::class);
     }
 
-    // attendance_record_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義
+    /**
+     * attendance_record_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義
+     */
     public function correctionRequests(): HasMany
     {
         return $this->hasMany(AttendanceCorrectionRequest::class);

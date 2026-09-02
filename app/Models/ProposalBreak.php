@@ -16,8 +16,9 @@ class ProposalBreak extends Model
         'break_out',
     ];
 
-    // attendance_correction_request_idを外部キーとして
-    // AttendanceCorrectionRequestモデルとのリレーションを定義
+    /**
+     * attendance_correction_request_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義
+     */
     public function attendanceCorrectionRequest(): BelongsTo
     {
         return $this->belongsTo(AttendanceCorrectionRequest::class);
