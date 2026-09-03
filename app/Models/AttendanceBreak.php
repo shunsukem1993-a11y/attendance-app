@@ -19,7 +19,9 @@ class AttendanceBreak extends Model
     ];
 
     /**
-     * attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+     * attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義する。
+     *
+     * @return BelongsTo AttendanceRecordとのリレーション
      */
     public function attendanceRecord(): BelongsTo
     {

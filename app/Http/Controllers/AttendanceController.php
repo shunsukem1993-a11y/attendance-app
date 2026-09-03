@@ -6,8 +6,10 @@ use App\Http\Requests\AttendanceStoreRequest;
 use App\Services\AttendanceDetailService;
 use App\Services\AttendanceListService;
 use App\Services\AttendanceService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
@@ -19,8 +21,10 @@ class AttendanceController extends Controller
 
     /**
      * 勤怠登録画面を表示する。
+     *
+     * @return View 勤怠登録画面
      */
-    public function create()
+    public function create(): View
     {
         $user = Auth::user();
 
@@ -43,8 +47,11 @@ class AttendanceController extends Controller
 
     /**
      * 勤怠打刻を処理する。
+     *
+     * @param  AttendanceStoreRequest  $request  勤怠打刻リクエスト
+     * @return RedirectResponse 勤怠登録画面へのリダイレクト
      */
-    public function store(AttendanceStoreRequest $request)
+    public function store(AttendanceStoreRequest $request): RedirectResponse
     {
         $error = $this->attendanceService->process(
             Auth::user(),
@@ -62,8 +69,11 @@ class AttendanceController extends Controller
 
     /**
      * 勤怠一覧画面を表示する。
+     *
+     * @param  Request  $request  月指定を含むリクエスト
+     * @return View 勤怠一覧画面
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $user = Auth::user();
 
@@ -89,8 +99,11 @@ class AttendanceController extends Controller
 
     /**
      * 勤怠詳細画面を表示する。
+     *
+     * @param  int  $id  勤怠記録ID
+     * @return View 勤怠詳細画面
      */
-    public function show(int $id)
+    public function show(int $id): View
     {
         $loginUser = Auth::user();
         $user = $loginUser;

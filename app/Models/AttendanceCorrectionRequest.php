@@ -30,7 +30,9 @@ class AttendanceCorrectionRequest extends Model
     ];
 
     /**
-     * user_idを外部キーとしてUserモデルとのリレーションを定義
+     * user_idを外部キーとしてUserモデルとのリレーションを定義する。
+     *
+     * @return BelongsTo Userとのリレーション
      */
     public function user(): BelongsTo
     {
@@ -38,7 +40,9 @@ class AttendanceCorrectionRequest extends Model
     }
 
     /**
-     * attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+     * attendance_record_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義する。
+     *
+     * @return BelongsTo AttendanceRecordとのリレーション
      */
     public function attendanceRecord(): BelongsTo
     {
@@ -46,7 +50,9 @@ class AttendanceCorrectionRequest extends Model
     }
 
     /**
-     * 修正申請に紐づく申請休憩情報とのリレーションを定義
+     * 修正申請に紐づく申請休憩情報とのリレーションを定義する。
+     *
+     * @return HasMany ProposalBreakとのリレーション
      */
     public function proposalBreaks(): HasMany
     {

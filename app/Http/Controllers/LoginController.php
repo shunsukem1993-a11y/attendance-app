@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /**
-     * 一般ユーザーをログインさせる
+     * 一般ユーザーをログインさせる。
+     *
+     * @param  LoginRequest  $request  ログインリクエスト
+     * @return RedirectResponse ログイン後のリダイレクト
      */
     public function store(LoginRequest $request): RedirectResponse
     {

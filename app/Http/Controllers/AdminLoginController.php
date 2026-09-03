@@ -10,7 +10,9 @@ use Illuminate\View\View;
 class AdminLoginController extends Controller
 {
     /**
-     * 管理者ログイン画面を表示する
+     * 管理者ログイン画面を表示する。
+     *
+     * @return View 管理者ログイン画面
      */
     public function create(): View
     {
@@ -18,7 +20,10 @@ class AdminLoginController extends Controller
     }
 
     /**
-     * 管理者をログインさせる
+     * 管理者をログインさせる。
+     *
+     * @param  LoginRequest  $request  ログインリクエスト
+     * @return RedirectResponse ログイン後のリダイレクト
      */
     public function store(LoginRequest $request): RedirectResponse
     {

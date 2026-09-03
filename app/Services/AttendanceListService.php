@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AttendanceBreak;
 use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
@@ -11,32 +12,32 @@ class AttendanceListService
 {
     /**
      * 指定月の勤怠記録を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  Carbon  $month  対象月
+     * @return Collection<int, array<string, mixed>> 月次勤怠データのCollection
      */
     public function getMonthlyRecords(
         User $user,
         Carbon $month
     ): Collection {
-        $attendanceRecords = AttendanceRecord::with('breaks')
-            ->where('user_id', $user->id)
-            ->whereBetween('date', [
-                $month->copy()->startOfMonth()->toDateString(),
-                $month->copy()->endOfMonth()->toDateString(),
-            ])
-            ->get()
-            ->keyBy(function (AttendanceRecord $attendanceRecord) {
-                return $attendanceRecord->date;
-            });
-
-        $records = collect();
-
         $startDate = $month->copy()->startOfMonth();
         $endDate = $month->copy()->endOfMonth();
 
-        for (
-            $date = $startDate->copy();
-            $date->lte($endDate);
-            $date->addDay()
-        ) {
+        $attendanceRecords = AttendanceRecord::with('breaks')
+            ->where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startDate->toDateString(),
+                $endDate->toDateString(),
+            ])
+            ->get()
+            ->keyBy(function (AttendanceRecord $attendanceRecord): string {
+                return $attendanceRecord->date;
+            });
+
+        return collect(
+            $startDate->daysUntil($endDate->copy()->addDay())
+        )->map(function (Carbon $date) use ($attendanceRecords): array {
             $dateString = $date->toDateString();
 
             $attendanceRecord = $attendanceRecords->get($dateString);
@@ -50,7 +51,7 @@ class AttendanceListService
                 $totalBreakTime
             );
 
-            $records->push([
+            return [
                 'id' => $attendanceRecord?->id,
                 'date' => $date->format('m/d'),
                 'clock_in' => $attendanceRecord?->clock_in
@@ -61,14 +62,15 @@ class AttendanceListService
                     : '',
                 'total_break_time' => $totalBreakTime,
                 'total_time' => $totalWorkTime,
-            ]);
-        }
-
-        return $records;
+            ];
+        });
     }
 
     /**
      * 休憩時間の合計を計算する。
+     *
+     * @param  AttendanceRecord|null  $attendanceRecord  勤怠記録
+     * @return string|null 休憩時間の合計
      */
     private function calculateTotalBreakTime(
         ?AttendanceRecord $attendanceRecord
@@ -77,18 +79,16 @@ class AttendanceListService
             return null;
         }
 
-        $totalSeconds = 0;
+        $totalSeconds = $attendanceRecord->breaks
+            ->filter(function (AttendanceBreak $break): bool {
+                return $break->break_in && $break->break_out;
+            })
+            ->sum(function (AttendanceBreak $break): int {
+                $breakIn = Carbon::parse($break->break_in);
+                $breakOut = Carbon::parse($break->break_out);
 
-        foreach ($attendanceRecord->breaks as $break) {
-            if (! $break->break_in || ! $break->break_out) {
-                continue;
-            }
-
-            $breakIn = Carbon::parse($break->break_in);
-            $breakOut = Carbon::parse($break->break_out);
-
-            $totalSeconds += $breakIn->diffInSeconds($breakOut);
-        }
+                return $breakIn->diffInSeconds($breakOut);
+            });
 
         return $totalSeconds > 0
             ? gmdate('H:i:s', $totalSeconds)
@@ -97,6 +97,10 @@ class AttendanceListService
 
     /**
      * 実働時間を計算する。
+     *
+     * @param  AttendanceRecord|null  $attendanceRecord  勤怠記録
+     * @param  string|null  $totalBreakTime  合計休憩時間
+     * @return string|null 実働時間
      */
     private function calculateTotalWorkTime(
         ?AttendanceRecord $attendanceRecord,

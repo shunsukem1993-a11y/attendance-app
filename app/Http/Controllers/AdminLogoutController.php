@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 class AdminLogoutController extends Controller
@@ -11,7 +12,13 @@ class AdminLogoutController extends Controller
         private AuthenticatedSessionController $logoutController
     ) {}
 
-    public function destroy(Request $request)
+    /**
+     * 管理者をログアウトさせる。
+     *
+     * @param  Request  $request  ログアウトリクエスト
+     * @return LogoutResponse ログアウト後のレスポンス
+     */
+    public function destroy(Request $request): LogoutResponse
     {
         // 管理者ログアウトであることをRequestに保存
         $request->attributes->set('is_admin_logout', true);

@@ -11,6 +11,8 @@ class AdminAttendanceCorrectionRequestService
 {
     /**
      * 全一般ユーザーの勤怠修正申請を取得する。
+     *
+     * @return Collection<int, AttendanceCorrectionRequest> 勤怠修正申請のCollection
      */
     public function getApplications(): Collection
     {
@@ -30,6 +32,9 @@ class AdminAttendanceCorrectionRequestService
 
     /**
      * 管理者の申請一覧画面で使用する形式に整形する。
+     *
+     * @param  AttendanceCorrectionRequest  $application  勤怠修正申請
+     * @return AttendanceCorrectionRequest 整形した勤怠修正申請
      */
     private function formatApplication(
         AttendanceCorrectionRequest $application
@@ -47,6 +52,9 @@ class AdminAttendanceCorrectionRequestService
 
     /**
      * 指定された勤怠修正申請の詳細を取得する。
+     *
+     * @param  int  $id  勤怠修正申請ID
+     * @return AttendanceCorrectionRequest 勤怠修正申請
      */
     public function getApplication(int $id): AttendanceCorrectionRequest
     {
@@ -73,6 +81,8 @@ class AdminAttendanceCorrectionRequestService
 
     /**
      * 勤怠修正申請を承認する。
+     *
+     * @param  int  $id  勤怠修正申請ID
      */
     public function approve(int $id): void
     {

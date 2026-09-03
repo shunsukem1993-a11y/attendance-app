@@ -46,13 +46,21 @@ class User extends Authenticatable
         'admin_status' => 'boolean',
     ];
 
-    // user_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義
+    /**
+     * user_idを外部キーとしてAttendanceRecordモデルとのリレーションを定義する。
+     *
+     * @return HasMany AttendanceRecordとのリレーション
+     */
     public function attendanceRecords(): HasMany
     {
         return $this->hasMany(AttendanceRecord::class);
     }
 
-    // user_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義
+    /**
+     * user_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義する。
+     *
+     * @return HasMany AttendanceCorrectionRequestとのリレーション
+     */
     public function attendanceCorrectionRequests(): HasMany
     {
         return $this->hasMany(AttendanceCorrectionRequest::class);

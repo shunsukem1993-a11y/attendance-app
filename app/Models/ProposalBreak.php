@@ -17,7 +17,9 @@ class ProposalBreak extends Model
     ];
 
     /**
-     * attendance_correction_request_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義
+     * attendance_correction_request_idを外部キーとしてAttendanceCorrectionRequestモデルとのリレーションを定義する。
+     *
+     * @return BelongsTo AttendanceCorrectionRequestとのリレーション
      */
     public function attendanceCorrectionRequest(): BelongsTo
     {

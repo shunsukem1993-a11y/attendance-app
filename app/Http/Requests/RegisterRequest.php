@@ -10,7 +10,9 @@ use Illuminate\Validation\Rule;
 class RegisterRequest extends FormRequest
 {
     /**
-     * リクエストを許可するか
+     * リクエストを許可するか。
+     *
+     * @return bool リクエストを許可する場合はtrue
      */
     public function authorize(): bool
     {
@@ -50,7 +52,9 @@ class RegisterRequest extends FormRequest
     }
 
     /**
-     * エラーメッセージ
+     * エラーメッセージを定義する。
+     *
+     * @return array<string, string> エラーメッセージ
      */
     public function messages(): array
     {

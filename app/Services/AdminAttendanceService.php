@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AttendanceBreak;
 use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
@@ -11,6 +12,8 @@ class AdminAttendanceService
 {
     /**
      * 全ユーザーを取得する。
+     *
+     * @return Collection<int, User> ユーザーのCollection
      */
     public function getUsers(): Collection
     {
@@ -19,48 +22,51 @@ class AdminAttendanceService
 
     /**
      * 指定日の勤怠記録を取得する。
+     *
+     * @param  Carbon  $date  対象日
+     * @return Collection<int, AttendanceRecord> 勤怠記録のCollection
      */
     public function getDailyRecords(Carbon $date): Collection
     {
-        $attendanceRecords = AttendanceRecord::with('breaks')
+        return AttendanceRecord::with('breaks')
             ->whereDate('date', $date)
-            ->get();
+            ->get()
+            ->map(function (AttendanceRecord $attendanceRecord): AttendanceRecord {
+                $totalBreakTime = $this->calculateTotalBreakTime(
+                    $attendanceRecord
+                );
 
-        foreach ($attendanceRecords as $attendanceRecord) {
-            $totalBreakTime = $this->calculateTotalBreakTime(
-                $attendanceRecord
-            );
+                $totalWorkTime = $this->calculateTotalWorkTime(
+                    $attendanceRecord,
+                    $totalBreakTime
+                );
 
-            $totalWorkTime = $this->calculateTotalWorkTime(
-                $attendanceRecord,
-                $totalBreakTime
-            );
+                $attendanceRecord->total_break_time = $totalBreakTime;
+                $attendanceRecord->total_time = $totalWorkTime;
 
-            $attendanceRecord->total_break_time = $totalBreakTime;
-            $attendanceRecord->total_time = $totalWorkTime;
-        }
-
-        return $attendanceRecords;
+                return $attendanceRecord;
+            });
     }
 
     /**
      * 休憩時間の合計を計算する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  勤怠記録
+     * @return string|null 休憩時間の合計
      */
     private function calculateTotalBreakTime(
         AttendanceRecord $attendanceRecord
     ): ?string {
-        $totalSeconds = 0;
+        $totalSeconds = $attendanceRecord->breaks
+            ->filter(function (AttendanceBreak $break): bool {
+                return $break->break_in && $break->break_out;
+            })
+            ->sum(function (AttendanceBreak $break): int {
+                $breakIn = Carbon::parse($break->break_in);
+                $breakOut = Carbon::parse($break->break_out);
 
-        foreach ($attendanceRecord->breaks as $break) {
-            if (! $break->break_in || ! $break->break_out) {
-                continue;
-            }
-
-            $breakIn = Carbon::parse($break->break_in);
-            $breakOut = Carbon::parse($break->break_out);
-
-            $totalSeconds += $breakIn->diffInSeconds($breakOut);
-        }
+                return $breakIn->diffInSeconds($breakOut);
+            });
 
         return $totalSeconds > 0
             ? gmdate('H:i:s', $totalSeconds)
@@ -69,6 +75,10 @@ class AdminAttendanceService
 
     /**
      * 実働時間を計算する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  勤怠記録
+     * @param  string|null  $totalBreakTime  合計休憩時間
+     * @return string|null 実働時間
      */
     private function calculateTotalWorkTime(
         AttendanceRecord $attendanceRecord,
@@ -98,6 +108,10 @@ class AdminAttendanceService
 
     /**
      * 指定ユーザーの月次勤怠記録を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  Carbon  $date  対象月
+     * @return Collection<int, array<string, mixed>> 月次勤怠データのCollection
      */
     public function getStaffMonthlyRecords(
         User $user,
@@ -113,37 +127,32 @@ class AdminAttendanceService
                 $endOfMonth->toDateString(),
             ])
             ->get()
-            ->keyBy(function ($attendanceRecord) {
+            ->keyBy(function (AttendanceRecord $attendanceRecord): string {
                 return Carbon::parse($attendanceRecord->date)
                     ->format('Y-m-d');
             });
 
-        $formattedRecords = collect();
-
-        for (
-            $currentDate = $startOfMonth->copy();
-            $currentDate->lte($endOfMonth);
-            $currentDate->addDay()
-        ) {
+        return collect(
+            $startOfMonth->daysUntil($endOfMonth->copy()->addDay())
+        )->map(function (Carbon $currentDate) use (
+            $attendanceRecords
+        ): array {
             $attendanceRecord = $attendanceRecords->get(
-                $currentDate->format('Y-m-d')
+                $currentDate->toDateString()
             );
 
-            if ($attendanceRecord) {
-                $totalBreakTime = $this->calculateTotalBreakTime(
-                    $attendanceRecord
-                );
+            $totalBreakTime = $attendanceRecord
+                ? $this->calculateTotalBreakTime($attendanceRecord)
+                : null;
 
-                $totalWorkTime = $this->calculateTotalWorkTime(
+            $totalWorkTime = $attendanceRecord
+                ? $this->calculateTotalWorkTime(
                     $attendanceRecord,
                     $totalBreakTime
-                );
+                )
+                : null;
 
-                $attendanceRecord->total_break_time = $totalBreakTime;
-                $attendanceRecord->total_time = $totalWorkTime;
-            }
-
-            $formattedRecords->push([
+            return [
                 'id' => $attendanceRecord?->id,
                 'date' => $currentDate->format('m/d'),
                 'clock_in' => $attendanceRecord?->clock_in
@@ -152,11 +161,9 @@ class AdminAttendanceService
                 'clock_out' => $attendanceRecord?->clock_out
                     ? Carbon::parse($attendanceRecord->clock_out)->format('H:i')
                     : '',
-                'total_break_time' => $attendanceRecord?->total_break_time,
-                'total_time' => $attendanceRecord?->total_time,
-            ]);
-        }
-
-        return $formattedRecords;
+                'total_break_time' => $totalBreakTime,
+                'total_time' => $totalWorkTime,
+            ];
+        });
     }
 }

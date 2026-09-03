@@ -8,7 +8,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class AttendanceStoreRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * リクエストを許可するか。
+     *
+     * @return bool リクエストを許可する場合はtrue
      */
     public function authorize(): bool
     {
