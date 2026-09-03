@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AttendanceBreak;
 use App\Models\AttendanceCorrectionRequest;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class AdminAttendanceCorrectionRequestService
@@ -49,11 +50,25 @@ class AdminAttendanceCorrectionRequestService
      */
     public function getApplication(int $id): AttendanceCorrectionRequest
     {
-        return AttendanceCorrectionRequest::with([
+        $application = AttendanceCorrectionRequest::with([
             'user',
             'attendanceRecord',
             'proposalBreaks',
         ])->findOrFail($id);
+
+        if ($application->new_clock_in) {
+            $application->new_clock_in = Carbon::parse(
+                $application->new_clock_in
+            )->format('H:i');
+        }
+
+        if ($application->new_clock_out) {
+            $application->new_clock_out = Carbon::parse(
+                $application->new_clock_out
+            )->format('H:i');
+        }
+
+        return $application;
     }
 
     /**
