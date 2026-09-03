@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendanceStoreRequest;
 use App\Services\AttendanceDetailService;
 use App\Services\AttendanceListService;
 use App\Services\AttendanceService;
@@ -43,12 +44,8 @@ class AttendanceController extends Controller
     /**
      * 勤怠打刻を処理する。
      */
-    public function store(Request $request)
+    public function store(AttendanceStoreRequest $request)
     {
-        $request->validate([
-            'action' => ['required', 'in:clock_in,clock_out,break_in,break_out'],
-        ]);
-
         $error = $this->attendanceService->process(
             Auth::user(),
             $request->input('action')
@@ -68,7 +65,6 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
-        $loginUser = Auth::user();
         $user = Auth::user();
 
         $date = $request->filled('date')
