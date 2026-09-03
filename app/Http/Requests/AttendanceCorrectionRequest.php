@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AttendanceCorrectionRequest extends FormRequest
@@ -12,7 +13,7 @@ class AttendanceCorrectionRequest extends FormRequest
     }
 
     /**
-     * バリデーション前に時刻を正規化する
+     * バリデーション前に時刻を正規化する。
      */
     protected function prepareForValidation(): void
     {
@@ -55,6 +56,11 @@ class AttendanceCorrectionRequest extends FormRequest
         );
     }
 
+    /**
+     * バリデーションルールを定義する。
+     *
+     * @return array<string, mixed> バリデーションルール
+     */
     public function rules(): array
     {
         return [
@@ -96,15 +102,17 @@ class AttendanceCorrectionRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator): void
+    /**
+     * バリデーション後の追加チェックを設定する。
+     *
+     * @param  Validator  $validator  バリデータ
+     */
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
+        $validator->after(function (Validator $validator): void {
             $clockIn = $this->input('new_clock_in');
             $clockOut = $this->input('new_clock_out');
 
-            /*
-            * 出勤・退勤の前後関係を確認する。
-            */
             if ($clockIn && $clockOut && $clockIn > $clockOut) {
                 $validator->errors()->add(
                     'new_clock_in',
@@ -112,18 +120,12 @@ class AttendanceCorrectionRequest extends FormRequest
                 );
             }
 
-            /*
-            * 休憩時間の前後関係を確認する。
-            */
             $breakIns = $this->input('new_break_in', []);
             $breakOuts = $this->input('new_break_out', []);
 
             foreach ($breakIns as $index => $breakIn) {
                 $breakOut = $breakOuts[$index] ?? null;
 
-                /*
-                * 休憩開始・終了はセットで入力する。
-                */
                 if (($breakIn && ! $breakOut) || (! $breakIn && $breakOut)) {
                     $validator->errors()->add(
                         "new_break_in.$index",
@@ -133,10 +135,6 @@ class AttendanceCorrectionRequest extends FormRequest
                     continue;
                 }
 
-                /*
-                * 休憩開始時間が出勤より前、
-                * または退勤より後の場合。
-                */
                 if (
                     $breakIn
                     && $clockIn
@@ -149,9 +147,6 @@ class AttendanceCorrectionRequest extends FormRequest
                     );
                 }
 
-                /*
-                * 休憩終了時間が退勤より後の場合。
-                */
                 if ($breakOut && $clockOut && $breakOut > $clockOut) {
                     $validator->errors()->add(
                         "new_break_out.$index",
@@ -159,9 +154,6 @@ class AttendanceCorrectionRequest extends FormRequest
                     );
                 }
 
-                /*
-                * 休憩終了時間が休憩開始より前の場合。
-                */
                 if ($breakIn && $breakOut && $breakOut < $breakIn) {
                     $validator->errors()->add(
                         "new_break_out.$index",
@@ -174,6 +166,8 @@ class AttendanceCorrectionRequest extends FormRequest
 
     /**
      * バリデーションエラーメッセージを定義する。
+     *
+     * @return array<string, string> エラーメッセージ
      */
     public function messages(): array
     {

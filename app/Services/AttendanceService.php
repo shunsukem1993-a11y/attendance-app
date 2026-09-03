@@ -10,6 +10,9 @@ class AttendanceService
 {
     /**
      * 今日の勤怠記録を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return AttendanceRecord|null 今日の勤怠記録
      */
     public function getTodayRecord(User $user): ?AttendanceRecord
     {
@@ -21,6 +24,9 @@ class AttendanceService
 
     /**
      * 勤怠ステータスを取得する。
+     *
+     * @param  AttendanceRecord|null  $attendanceRecord  勤怠記録
+     * @return string 勤怠ステータス
      */
     public function getStatus(?AttendanceRecord $attendanceRecord): string
     {
@@ -40,6 +46,10 @@ class AttendanceService
 
     /**
      * 勤怠打刻を処理する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  string  $action  打刻アクション
+     * @return string|null エラーメッセージ。正常終了時はnull
      */
     public function process(User $user, string $action): ?string
     {
@@ -54,6 +64,9 @@ class AttendanceService
 
     /**
      * 出勤する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return string|null エラーメッセージ。正常終了時はnull
      */
     private function clockIn(User $user): ?string
     {
@@ -74,6 +87,9 @@ class AttendanceService
 
     /**
      * 休憩を開始する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return string|null エラーメッセージ。正常終了時はnull
      */
     private function breakIn(User $user): ?string
     {
@@ -101,6 +117,9 @@ class AttendanceService
 
     /**
      * 休憩を終了する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return string|null エラーメッセージ。正常終了時はnull
      */
     private function breakOut(User $user): ?string
     {
@@ -131,6 +150,9 @@ class AttendanceService
 
     /**
      * 退勤する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return string|null エラーメッセージ。正常終了時はnull
      */
     private function clockOut(User $user): ?string
     {
@@ -157,6 +179,9 @@ class AttendanceService
 
     /**
      * 現在休憩中か確認する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  勤怠記録
+     * @return bool 休憩中の場合はtrue
      */
     private function hasActiveBreak(AttendanceRecord $attendanceRecord): bool
     {

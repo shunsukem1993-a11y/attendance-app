@@ -7,8 +7,10 @@ use App\Models\User;
 use App\Services\AdminAttendanceDetailService;
 use App\Services\AdminAttendanceService;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AdminAttendanceController extends Controller
 {
@@ -19,8 +21,11 @@ class AdminAttendanceController extends Controller
 
     /**
      * 管理者勤怠一覧画面を表示する。
+     *
+     * @param  Request  $request  日付指定を含むリクエスト
+     * @return View 管理者勤怠一覧画面
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $date = $request->filled('date')
             ? Carbon::createFromFormat(
@@ -53,8 +58,11 @@ class AdminAttendanceController extends Controller
 
     /**
      * 管理者の勤怠詳細画面を表示する。
+     *
+     * @param  int  $id  勤怠記録ID
+     * @return View 管理者勤怠詳細画面
      */
-    public function show(int $id)
+    public function show(int $id): View
     {
         $loginUser = Auth::user();
 
@@ -73,11 +81,15 @@ class AdminAttendanceController extends Controller
 
     /**
      * 管理者が勤怠を直接修正する。
+     *
+     * @param  AttendanceCorrectionRequestForm  $request  勤怠修正リクエスト
+     * @param  int  $id  勤怠記録ID
+     * @return RedirectResponse 勤怠詳細画面へのリダイレクト
      */
     public function update(
         AttendanceCorrectionRequestForm $request,
         int $id
-    ) {
+    ): RedirectResponse {
         $this->adminAttendanceDetailService->updateAttendance(
             $id,
             $request->validated()
@@ -90,8 +102,12 @@ class AdminAttendanceController extends Controller
 
     /**
      * スタッフ別月次勤怠一覧画面を表示する。
+     *
+     * @param  Request  $request  月指定を含むリクエスト
+     * @param  int  $id  スタッフのユーザーID
+     * @return View スタッフ別月次勤怠一覧画面
      */
-    public function staff(Request $request, int $id)
+    public function staff(Request $request, int $id): View
     {
         $user = User::findOrFail($id);
 

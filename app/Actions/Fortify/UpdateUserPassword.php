@@ -13,9 +13,10 @@ class UpdateUserPassword implements UpdatesUserPasswords
     use PasswordValidationRules;
 
     /**
-     * Validate and update the user's password.
+     * ユーザーのパスワードを検証してリセットする。
      *
-     * @param  array<string, string>  $input
+     * @param  User  $user  パスワードをリセットするユーザー
+     * @param  array<string, string>  $input  パスワード入力値
      *
      * @throws ValidationException
      */

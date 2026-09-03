@@ -12,9 +12,10 @@ use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
     /**
-     * Validate and update the given user's profile information.
+     * ユーザーのプロフィール情報を検証して更新する。
      *
-     * @param  array<string, string>  $input
+     * @param  User  $user  更新対象のユーザー
+     * @param  array<string, string>  $input  プロフィール入力値
      *
      * @throws ValidationException
      */

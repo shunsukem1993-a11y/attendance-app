@@ -12,6 +12,10 @@ class AttendanceDetailService
 {
     /**
      * 指定された勤怠の詳細を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  int  $id  勤怠記録ID
+     * @return AttendanceRecord 勤怠記録
      */
     public function getAttendanceDetail(
         User $user,
@@ -28,6 +32,9 @@ class AttendanceDetailService
 
     /**
      * 勤怠詳細画面で使用する形式に整形する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  勤怠記録
+     * @return array<string, mixed> 勤怠詳細画面用のデータ
      */
     public function formatAttendanceDetail(
         AttendanceRecord $attendanceRecord

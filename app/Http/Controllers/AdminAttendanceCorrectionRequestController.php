@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceCorrectionRequest;
 use App\Services\AdminAttendanceCorrectionRequestService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AdminAttendanceCorrectionRequestController extends Controller
 {
@@ -13,8 +15,10 @@ class AdminAttendanceCorrectionRequestController extends Controller
 
     /**
      * 管理者の勤怠修正申請一覧画面を表示する。
+     *
+     * @return View 管理者の勤怠修正申請一覧画面
      */
-    public function index()
+    public function index(): View
     {
         $applications = $this->adminAttendanceCorrectionRequestService
             ->getApplications();
@@ -26,8 +30,11 @@ class AdminAttendanceCorrectionRequestController extends Controller
 
     /**
      * 管理者の勤怠修正申請詳細画面を表示する。
+     *
+     * @param  int  $id  勤怠修正申請ID
+     * @return View 管理者の勤怠修正申請詳細画面
      */
-    public function show(int $id)
+    public function show(int $id): View
     {
         $application = $this->adminAttendanceCorrectionRequestService
             ->getApplication($id);
@@ -45,8 +52,11 @@ class AdminAttendanceCorrectionRequestController extends Controller
 
     /**
      * 管理者が勤怠修正申請を承認する。
+     *
+     * @param  int  $id  勤怠修正申請ID
+     * @return RedirectResponse 勤怠修正申請詳細画面へのリダイレクト
      */
-    public function approve(int $id)
+    public function approve(int $id): RedirectResponse
     {
         $this->adminAttendanceCorrectionRequestService
             ->approve($id);

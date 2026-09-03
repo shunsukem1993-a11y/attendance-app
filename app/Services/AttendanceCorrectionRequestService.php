@@ -11,6 +11,9 @@ class AttendanceCorrectionRequestService
 {
     /**
      * 一般ユーザー自身の勤怠修正申請を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @return Collection<int, array<string, mixed>> 勤怠修正申請のCollection
      */
     public function getApplications(User $user): Collection
     {
@@ -40,6 +43,10 @@ class AttendanceCorrectionRequestService
 
     /**
      * 一般ユーザー自身の勤怠修正申請を取得する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  int  $id  勤怠修正申請ID
+     * @return AttendanceCorrectionRequest 勤怠修正申請
      */
     public function getApplication(
         User $user,
@@ -52,6 +59,11 @@ class AttendanceCorrectionRequestService
 
     /**
      * 一般ユーザーの勤怠修正申請を登録する。
+     *
+     * @param  User  $user  対象ユーザー
+     * @param  int  $attendanceRecordId  勤怠記録ID
+     * @param  array<string, mixed>  $data  申請データ
+     * @return AttendanceCorrectionRequest 作成した勤怠修正申請
      */
     public function create(
         User $user,

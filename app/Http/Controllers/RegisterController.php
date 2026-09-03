@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Auth;
 class RegisterController extends Controller
 {
     /**
-     * 一般ユーザーを登録する
+     * 一般ユーザーを登録する。
+     *
+     * @param  RegisterRequest  $request  ユーザー登録リクエスト
+     * @param  CreateNewUser  $creator  ユーザー作成アクション
+     * @return RedirectResponse 登録後のリダイレクト
      */
     public function store(
         RegisterRequest $request,

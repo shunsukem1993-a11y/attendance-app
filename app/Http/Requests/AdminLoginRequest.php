@@ -7,7 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class AdminLoginRequest extends FormRequest
 {
     /**
-     * リクエストを許可するか
+     * リクエストを許可するか。
+     *
+     * @return bool リクエストを許可する場合はtrue
      */
     public function authorize(): bool
     {
@@ -15,7 +17,9 @@ class AdminLoginRequest extends FormRequest
     }
 
     /**
-     * バリデーションルール
+     * バリデーションルールを定義する。
+     *
+     * @return array<string, mixed> バリデーションルール
      */
     public function rules(): array
     {
@@ -33,7 +37,9 @@ class AdminLoginRequest extends FormRequest
     }
 
     /**
-     * エラーメッセージ
+     * エラーメッセージを定義する。
+     *
+     * @return array<string, string> エラーメッセージ
      */
     public function messages(): array
     {
