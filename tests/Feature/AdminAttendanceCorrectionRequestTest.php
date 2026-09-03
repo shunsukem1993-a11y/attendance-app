@@ -30,8 +30,8 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
         $attendanceRecord = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'date' => '2026-09-01',
-            'clock_in' => '09:00:00',
-            'clock_out' => '18:00:00',
+            'clock_in' => '09:00',
+            'clock_out' => '18:00',
         ]);
 
         $application = $this->createCorrectionRequest(
@@ -39,10 +39,10 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
             $attendanceRecord,
             AttendanceCorrectionRequest::STATUS_PENDING,
             [
-                'comment' => '勤務時間を修正してください',
+                'comment' => '勤務時間を修正',
                 'new_date' => '2026-09-01',
-                'new_clock_in' => '09:30:00',
-                'new_clock_out' => '18:30:00',
+                'new_clock_in' => '09:30',
+                'new_clock_out' => '18:30',
             ]
         );
 
@@ -62,9 +62,9 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
         });
 
         $response->assertSee('申請者ユーザー');
-        $response->assertSee('勤務時間を修正してください');
-        $response->assertSee('09:30:00');
-        $response->assertSee('18:30:00');
+        $response->assertSee('勤務時間を修正');
+        $response->assertSee('09:30');
+        $response->assertSee('18:30');
     }
 
     /**
@@ -79,15 +79,15 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
         $attendanceRecord = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'date' => '2026-09-01',
-            'clock_in' => '09:00:00',
-            'clock_out' => '18:00:00',
+            'clock_in' => '09:00',
+            'clock_out' => '18:00',
             'comment' => '修正前コメント',
         ]);
 
         AttendanceBreak::factory()->create([
             'attendance_record_id' => $attendanceRecord->id,
-            'break_in' => '12:00:00',
-            'break_out' => '13:00:00',
+            'break_in' => '12:00',
+            'break_out' => '13:00',
         ]);
 
         $application = $this->createCorrectionRequest(
@@ -97,15 +97,15 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
             [
                 'comment' => '修正後コメント',
                 'new_date' => '2026-09-02',
-                'new_clock_in' => '09:30:00',
-                'new_clock_out' => '18:30:00',
+                'new_clock_in' => '09:30',
+                'new_clock_out' => '18:30',
             ]
         );
 
         ProposalBreak::factory()->create([
             'attendance_correction_request_id' => $application->id,
-            'break_in' => '12:30:00',
-            'break_out' => '13:30:00',
+            'break_in' => '12:30',
+            'break_out' => '13:30',
         ]);
 
         $response = $this->post(
@@ -127,21 +127,21 @@ class AdminAttendanceCorrectionRequestTest extends TestCase
         $this->assertDatabaseHas('attendance_records', [
             'id' => $attendanceRecord->id,
             'date' => '2026-09-02 00:00:00',
-            'clock_in' => '09:30:00',
-            'clock_out' => '18:30:00',
+            'clock_in' => '09:30',
+            'clock_out' => '18:30',
             'comment' => '修正後コメント',
         ]);
 
         $this->assertDatabaseHas('breaks', [
             'attendance_record_id' => $attendanceRecord->id,
-            'break_in' => '12:30:00',
-            'break_out' => '13:30:00',
+            'break_in' => '12:30',
+            'break_out' => '13:30',
         ]);
 
         $this->assertDatabaseMissing('breaks', [
             'attendance_record_id' => $attendanceRecord->id,
-            'break_in' => '12:00:00',
-            'break_out' => '13:00:00',
+            'break_in' => '12:00',
+            'break_out' => '13:00',
         ]);
     }
 }

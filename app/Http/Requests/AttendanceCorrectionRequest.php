@@ -11,7 +11,7 @@ class AttendanceCorrectionRequest extends FormRequest
         return true;
     }
 
-     /**
+    /**
      * バリデーション前に時刻を正規化する
      */
     protected function prepareForValidation(): void

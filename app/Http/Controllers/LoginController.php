@@ -15,6 +15,8 @@ class LoginController extends Controller
     {
         $credentials = $request->validated();
 
+        $credentials['admin_status'] = false;
+
         if (! Auth::attempt($credentials)) {
             return back()
                 ->withErrors([
