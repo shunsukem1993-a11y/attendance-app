@@ -123,7 +123,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $response->assertRedirect(route('attendance.create'));
+        $response->assertRedirect(route('verification.notice'));
 
         $this->assertDatabaseHas('users', [
             'name' => 'テストユーザー',
