@@ -21,8 +21,10 @@
     </header>
     <main>
         <div class="verify__content">
-            @if (session('message'))
-                <div class="verify__flash">{{ session('message') }}</div>
+            @if (session('status'))
+                <div class="verify__flash">
+                    {{ __('verification.' . session('status')) }}
+                </div>
             @endif
 
             <p class="verify__text">

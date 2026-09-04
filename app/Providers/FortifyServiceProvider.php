@@ -68,8 +68,14 @@ class FortifyServiceProvider extends ServiceProvider
             return view('user.user-login');
         });
 
+        // 一般ユーザーの登録画面を表示する
         Fortify::registerView(function () {
             return view('user.register');
+        });
+
+        // 一般ユーザーのメール確認画面を表示する
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
         });
     }
 }

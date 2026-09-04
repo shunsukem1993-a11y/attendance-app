@@ -36,7 +36,7 @@ Route::post('/login', [LoginController::class, 'store'])
     ->name('login.store');
 
 // 一般ユーザー
-Route::middleware(['auth', 'general.user'])->group(function () {
+Route::middleware(['auth', 'verified', 'general.user'])->group(function () {
 
     // 勤怠登録画面
     Route::get('/attendance', [AttendanceController::class, 'create'])
@@ -68,7 +68,7 @@ Route::middleware(['auth', 'general.user'])->group(function () {
 });
 
 // 勤怠修正申請一覧画面（一般ユーザー用、管理者用）
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get(
         '/stamp_correction_request/list',
         [AttendanceCorrectionRequestListController::class, 'index']
