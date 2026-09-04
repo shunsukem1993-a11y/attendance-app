@@ -122,6 +122,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
         [AdminAttendanceController::class, 'staff']
     )->name('admin.attendance.staff');
 
+    // スタッフ別月次勤怠一覧のCSV出力
+    Route::post(
+        '/export',
+        [AdminAttendanceController::class, 'export']
+    )->name('admin.attendance.export');
+
     // 管理者勤怠修正申請詳細画面
     Route::get(
         '/stamp_correction_request/approve/{id}',

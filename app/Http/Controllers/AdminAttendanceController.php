@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminAttendanceCsvRequest;
 use App\Http\Requests\AttendanceCorrectionRequest as AttendanceCorrectionRequestForm;
 use App\Models\User;
+use App\Services\AdminAttendanceCsvService;
 use App\Services\AdminAttendanceDetailService;
 use App\Services\AdminAttendanceService;
 use Carbon\Carbon;
@@ -11,12 +13,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminAttendanceController extends Controller
 {
     public function __construct(
         private AdminAttendanceService $adminAttendanceService,
-        private AdminAttendanceDetailService $adminAttendanceDetailService
+        private AdminAttendanceDetailService $adminAttendanceDetailService,
+        private AdminAttendanceCsvService $adminAttendanceCsvService
     ) {}
 
     /**
@@ -136,5 +140,41 @@ class AdminAttendanceController extends Controller
             'nextMonth',
             'formattedAttendanceRecords'
         ));
+    }
+
+    /**
+     * スタッフ別月次勤怠一覧をCSV出力する。
+     *
+     * @param  AdminAttendanceCsvRequest  $request  CSV出力リクエスト
+     * @return StreamedResponse CSVファイルのダウンロード
+     */
+    public function export(
+        AdminAttendanceCsvRequest $request
+    ): StreamedResponse {
+        $user = User::findOrFail($request->input('user_id'));
+
+        $date = Carbon::createFromFormat(
+            'Y-m',
+            $request->input('year_month')
+        );
+
+        $attendanceRecords = $this->adminAttendanceService
+            ->getStaffMonthlyRecords($user, $date);
+
+        $csv = $this->adminAttendanceCsvService
+            ->generate($attendanceRecords);
+
+        $fileName = $this->adminAttendanceCsvService
+            ->generateFileName($user->name, $date);
+
+        return response()->streamDownload(
+            function () use ($csv): void {
+                echo $csv;
+            },
+            $fileName,
+            [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+            ]
+        );
     }
 }
