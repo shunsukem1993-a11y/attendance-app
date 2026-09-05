@@ -36,7 +36,7 @@ class AttendanceListService
             });
 
         return collect(
-            $startDate->daysUntil($endDate->copy()->addDay())
+            $startDate->daysUntil($endDate)
         )->map(function (Carbon $date) use ($attendanceRecords): array {
             $dateString = $date->toDateString();
 
