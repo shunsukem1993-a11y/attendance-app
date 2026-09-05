@@ -133,7 +133,7 @@ class AdminAttendanceService
             });
 
         return collect(
-            $startOfMonth->daysUntil($endOfMonth->copy()->addDay())
+            $startOfMonth->daysUntil($endOfMonth)
         )->map(function (Carbon $currentDate) use (
             $attendanceRecords
         ): array {
