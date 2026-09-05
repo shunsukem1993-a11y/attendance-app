@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Testing\TestResponse;
 use Tests\Support\AttendanceReportTestHelper;
 use Tests\TestCase;
 
@@ -12,49 +11,6 @@ class AttendanceReportTest extends TestCase
 {
     use AttendanceReportTestHelper;
     use RefreshDatabase;
-
-    /**
-     * 勤怠レポートのサマリーが正しいことを検証する。
-     */
-    private function assertSummary(TestResponse $response): void
-    {
-        $response->assertViewHas('summary', [
-            'total_work_minutes' => 1020,
-            'total_overtime_minutes' => 60,
-            'avg_work_minutes' => 510,
-        ]);
-    }
-
-    /**
-     * 勤怠レポートの月別推移が正しいことを検証する。
-     */
-    private function assertMonthlyTrend(TestResponse $response): void
-    {
-        $response->assertViewHas('monthlyTrend', function ($monthlyTrend) {
-            $months = $monthlyTrend->keyBy('month');
-
-            $previousMonth = now()->subMonth()->format('Y-m');
-            $twoMonthsAgo = now()->subMonths(2)->format('Y-m');
-
-            return $monthlyTrend->count() === 6
-                && $months[$previousMonth]['work_minutes'] === 540
-                && $months[$previousMonth]['overtime_minutes'] === 60
-                && $months[$twoMonthsAgo]['work_minutes'] === 480
-                && $months[$twoMonthsAgo]['overtime_minutes'] === 0;
-        });
-    }
-
-    /**
-     * 勤怠レポートの異常件数が正しいことを検証する。
-     */
-    private function assertAnomalies(TestResponse $response): void
-    {
-        $response->assertViewHas('anomalies', [
-            'late_count' => 1,
-            'early_leave_count' => 1,
-            'long_work_count' => 1,
-        ]);
-    }
 
     /**
      * 未認証ユーザーは勤怠レポート画面にアクセスできない。
@@ -81,9 +37,30 @@ class AttendanceReportTest extends TestCase
 
         $response->assertOk();
 
-        $this->assertSummary($response);
-        $this->assertMonthlyTrend($response);
-        $this->assertAnomalies($response);
+        $response->assertViewHas('summary', [
+            'total_work_minutes' => 1020,
+            'total_overtime_minutes' => 60,
+            'avg_work_minutes' => 510,
+        ]);
+
+        $response->assertViewHas('monthlyTrend', function ($monthlyTrend) {
+            $months = $monthlyTrend->keyBy('month');
+
+            $previousMonth = now()->subMonth()->format('Y-m');
+            $twoMonthsAgo = now()->subMonths(2)->format('Y-m');
+
+            return $monthlyTrend->count() === 6
+                && $months[$previousMonth]['work_minutes'] === 540
+                && $months[$previousMonth]['overtime_minutes'] === 60
+                && $months[$twoMonthsAgo]['work_minutes'] === 480
+                && $months[$twoMonthsAgo]['overtime_minutes'] === 0;
+        });
+
+        $response->assertViewHas('anomalies', [
+            'late_count' => 1,
+            'early_leave_count' => 1,
+            'long_work_count' => 1,
+        ]);
     }
 
     /**
