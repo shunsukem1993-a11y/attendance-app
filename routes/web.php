@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionRequestController;
 use App\Http\Controllers\AttendanceCorrectionRequestListController;
+use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,12 @@ Route::middleware(['auth', 'verified', 'general.user'])->group(function () {
         '/application/detail/{id}',
         [AttendanceCorrectionRequestController::class, 'show']
     )->name('attendance.correction.show');
+
+    // マイ勤怠レポート画面
+    Route::get(
+        '/attendance/report',
+        [AttendanceReportController::class, 'index']
+    )->name('attendance.report');
 });
 
 // 勤怠修正申請一覧画面（一般ユーザー用、管理者用）
