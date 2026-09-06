@@ -23,7 +23,7 @@ class AttendanceReportService
     {
         $startDate = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
         $endDate = now()->endOfMonth();
 
@@ -70,11 +70,9 @@ class AttendanceReportService
     ): array {
         $startDate = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
-        $endDate = now()
-            ->startOfMonth()
-            ->subDay();
+        $endDate = now()->endOfMonth();
 
         $targetResults = $dailyResults->filter(
             fn (array $result): bool => Carbon::parse($result['record']->date)->between(
@@ -126,7 +124,7 @@ class AttendanceReportService
     ): Collection {
         $startMonth = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
         return collect(range(0, 5))->map(
             function (int $month) use (

@@ -38,9 +38,9 @@ class AttendanceReportTest extends TestCase
         $response->assertOk();
 
         $response->assertViewHas('summary', [
-            'total_work_minutes' => 1020,
-            'total_overtime_minutes' => 60,
-            'avg_work_minutes' => 510,
+            'total_work_minutes' => 2670,
+            'total_overtime_minutes' => 270,
+            'avg_work_minutes' => 534,
         ]);
 
         $response->assertViewHas('monthlyTrend', function ($monthlyTrend) {
