@@ -14,7 +14,7 @@ class AttendanceReportService
     ) {}
 
     /**
-     * 今月と今月を除く過去6か月分の勤怠記録を取得する。
+     * 今月を含む過去6か月分の勤怠記録を取得する。
      *
      * @param  User  $user  対象ユーザー
      * @return Collection<int, AttendanceRecord> 勤怠記録のCollection
@@ -23,7 +23,7 @@ class AttendanceReportService
     {
         $startDate = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
         $endDate = now()->endOfMonth();
 
@@ -70,11 +70,9 @@ class AttendanceReportService
     ): array {
         $startDate = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
-        $endDate = now()
-            ->startOfMonth()
-            ->subDay();
+        $endDate = now()->endOfMonth();
 
         $targetResults = $dailyResults->filter(
             fn (array $result): bool => Carbon::parse($result['record']->date)->between(
@@ -113,7 +111,7 @@ class AttendanceReportService
     }
 
     /**
-     * 過去6か月分の月次勤怠サマリーを取得する。
+     * 今月を含む過去6か月分の月次勤怠サマリーを取得する。
      *
      * 勤怠記録が存在しない月も0時間として返す。
      *
@@ -126,7 +124,7 @@ class AttendanceReportService
     ): Collection {
         $startMonth = now()
             ->startOfMonth()
-            ->subMonths(6);
+            ->subMonths(5);
 
         return collect(range(0, 5))->map(
             function (int $month) use (
