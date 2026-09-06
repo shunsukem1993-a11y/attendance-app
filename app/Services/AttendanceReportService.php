@@ -14,7 +14,7 @@ class AttendanceReportService
     ) {}
 
     /**
-     * 今月と今月を除く過去6か月分の勤怠記録を取得する。
+     * 今月を含む過去6か月分の勤怠記録を取得する。
      *
      * @param  User  $user  対象ユーザー
      * @return Collection<int, AttendanceRecord> 勤怠記録のCollection
@@ -111,7 +111,7 @@ class AttendanceReportService
     }
 
     /**
-     * 過去6か月分の月次勤怠サマリーを取得する。
+     * 今月を含む過去6か月分の月次勤怠サマリーを取得する。
      *
      * 勤怠記録が存在しない月も0時間として返す。
      *
