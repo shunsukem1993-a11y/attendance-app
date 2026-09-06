@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Attendance;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -38,18 +38,21 @@ class AttendanceReportTest extends TestCase
         $response->assertOk();
 
         $response->assertViewHas('summary', [
-            'total_work_minutes' => 1020,
-            'total_overtime_minutes' => 60,
-            'avg_work_minutes' => 510,
+            'total_work_minutes' => 2670,
+            'total_overtime_minutes' => 270,
+            'avg_work_minutes' => 534,
         ]);
 
         $response->assertViewHas('monthlyTrend', function ($monthlyTrend) {
             $months = $monthlyTrend->keyBy('month');
 
+            $currentMonth = now()->format('Y-m');
             $previousMonth = now()->subMonth()->format('Y-m');
             $twoMonthsAgo = now()->subMonths(2)->format('Y-m');
 
             return $monthlyTrend->count() === 6
+                && $months[$currentMonth]['work_minutes'] === 1650
+                && $months[$currentMonth]['overtime_minutes'] === 210
                 && $months[$previousMonth]['work_minutes'] === 540
                 && $months[$previousMonth]['overtime_minutes'] === 60
                 && $months[$twoMonthsAgo]['work_minutes'] === 480
