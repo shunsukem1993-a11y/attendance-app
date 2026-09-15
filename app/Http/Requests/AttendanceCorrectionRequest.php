@@ -7,6 +7,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AttendanceCorrectionRequest extends FormRequest
 {
+    /**
+     * リクエストを実行する権限があるか確認する。
+     *
+     * @return bool リクエストを許可する場合はtrue
+     */
     public function authorize(): bool
     {
         return true;

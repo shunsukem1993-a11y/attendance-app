@@ -7,9 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class AdminAttendanceCsvRequest extends FormRequest
 {
     /**
-     * リクエストの認可を判定する。
+     * リクエストを実行する権限があるか確認する。
      *
-     * @return bool 認可結果
+     * @return bool リクエストを許可する場合はtrue
      */
     public function authorize(): bool
     {

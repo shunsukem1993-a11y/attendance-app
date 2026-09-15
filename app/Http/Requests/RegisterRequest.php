@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,9 +19,9 @@ class RegisterRequest extends FormRequest
     }
 
     /**
-     * バリデーションルール
+     * バリデーションルールを定義する。
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, mixed> バリデーションルール
      */
     public function rules(): array
     {

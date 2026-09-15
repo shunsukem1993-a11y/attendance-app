@@ -10,6 +10,9 @@ class AttendanceTimeService
 {
     /**
      * 休憩時間の合計を計算する。
+     *
+     * @param  AttendanceRecord|null  $attendanceRecord  対象の勤怠情報
+     * @return string|null 休憩時間の合計。休憩時間がない場合はnull
      */
     public function calculateTotalBreakTime(
         ?AttendanceRecord $attendanceRecord
@@ -36,6 +39,10 @@ class AttendanceTimeService
 
     /**
      * 実働時間を計算する。
+     *
+     * @param  AttendanceRecord|null  $attendanceRecord  対象の勤怠情報
+     * @param  string|null  $totalBreakTime  合計休憩時間
+     * @return string|null 実働時間。出勤時刻または退勤時刻がない場合はnull
      */
     public function calculateTotalWorkTime(
         ?AttendanceRecord $attendanceRecord,

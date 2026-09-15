@@ -10,6 +10,9 @@ class AttendanceRecordWriteTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * 勤怠情報を登録できることを確認する。
+     */
     public function test_attendance_record_can_be_created(): void
     {
         $user = User::factory()->create();
@@ -38,6 +41,9 @@ class AttendanceRecordWriteTest extends TestCase
         ]);
     }
 
+    /**
+     * 勤怠情報のバリデーションエラーで422が返ることを確認する。
+     */
     public function test_attendance_record_validation_error_returns_422(): void
     {
         $user = User::factory()->create();
@@ -61,6 +67,9 @@ class AttendanceRecordWriteTest extends TestCase
             );
     }
 
+    /**
+     * 自分の勤怠情報を更新できることを確認する。
+     */
     public function test_attendance_record_can_be_updated(): void
     {
         $user = User::factory()->create();
@@ -100,6 +109,9 @@ class AttendanceRecordWriteTest extends TestCase
         ]);
     }
 
+    /**
+     * 存在しない勤怠情報の更新で404が返ることを確認する。
+     */
     public function test_update_nonexistent_attendance_record_returns_404(): void
     {
         $user = User::factory()->create();
@@ -121,6 +133,9 @@ class AttendanceRecordWriteTest extends TestCase
             ]);
     }
 
+    /**
+     * 自分の勤怠情報を削除できることを確認する。
+     */
     public function test_attendance_record_can_be_deleted(): void
     {
         $user = User::factory()->create();
@@ -144,6 +159,9 @@ class AttendanceRecordWriteTest extends TestCase
         ]);
     }
 
+    /**
+     * 存在しない勤怠情報の削除で404が返ることを確認する。
+     */
     public function test_delete_nonexistent_attendance_record_returns_404(): void
     {
         $user = User::factory()->create();

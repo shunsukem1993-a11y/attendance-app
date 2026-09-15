@@ -20,6 +20,13 @@ class AttendanceRecordController extends Controller
      *
      * 指定されたユーザー、日付、月で勤怠情報を絞り込み、
      * ページネーション付きで返す。
+     *
+     * @param  IndexAttendanceRecordRequest  $request
+     *                                                 勤怠一覧の検索条件を含むリクエスト
+     * @param  AttendanceTimeService  $attendanceTimeService
+     *                                                        勤務時間・休憩時間を計算するサービス
+     * @return AnonymousResourceCollection
+     *                                     勤怠一覧のリソースコレクション
      */
     public function index(
         IndexAttendanceRecordRequest $request,
@@ -85,6 +92,9 @@ class AttendanceRecordController extends Controller
 
     /**
      * 指定された勤怠の詳細を取得する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  取得対象の勤怠情報
+     * @return JsonResponse 勤怠詳細のJSONレスポンス
      */
     public function show(
         AttendanceRecord $attendanceRecord
@@ -109,6 +119,11 @@ class AttendanceRecordController extends Controller
 
     /**
      * 勤怠情報を新規作成する。
+     *
+     * @param  StoreAttendanceRecordRequest  $request
+     *                                                 新規勤怠情報を含むリクエスト
+     * @return JsonResponse
+     *                      作成された勤怠情報のJSONレスポンス
      */
     public function store(
         StoreAttendanceRecordRequest $request
@@ -131,6 +146,13 @@ class AttendanceRecordController extends Controller
 
     /**
      * 指定された勤怠情報を更新する。
+     *
+     * @param  UpdateAttendanceRecordRequest  $request
+     *                                                  更新する勤怠情報を含むリクエスト
+     * @param  AttendanceRecord  $attendanceRecord
+     *                                              更新対象の勤怠情報
+     * @return AttendanceRecordResource
+     *                                  更新された勤怠情報のリソース
      */
     public function update(
         UpdateAttendanceRecordRequest $request,
@@ -150,6 +172,11 @@ class AttendanceRecordController extends Controller
 
     /**
      * 指定された勤怠情報を削除する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord
+     *                                              削除対象の勤怠情報
+     * @return Response
+     *                  削除成功時の空レスポンス
      */
     public function destroy(AttendanceRecord $attendanceRecord): Response
     {

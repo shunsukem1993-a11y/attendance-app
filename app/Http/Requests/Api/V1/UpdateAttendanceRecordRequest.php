@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests\Api\V1;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateAttendanceRecordRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * リクエストを実行する権限があるか確認する。
+     *
+     * @return bool リクエストを許可する場合はtrue
      */
     public function authorize(): bool
     {
@@ -17,9 +18,9 @@ class UpdateAttendanceRecordRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * バリデーションルールを定義する。
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * @return array<string, mixed> バリデーションルール
      */
     public function rules(): array
     {
@@ -59,6 +60,11 @@ class UpdateAttendanceRecordRequest extends FormRequest
         ];
     }
 
+    /**
+     * エラーメッセージを定義する。
+     *
+     * @return array<string, string> エラーメッセージ
+     */
     public function messages(): array
     {
         return [

@@ -13,6 +13,9 @@ class AttendanceRecordTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * 勤怠一覧を取得できることを確認する。
+     */
     public function test_attendance_records_can_be_listed(): void
     {
         $user = User::factory()->create();
@@ -42,6 +45,9 @@ class AttendanceRecordTest extends TestCase
             ]);
     }
 
+    /**
+     * 指定された勤怠の詳細を取得できることを確認する。
+     */
     public function test_attendance_record_detail_can_be_retrieved(): void
     {
         $user = User::factory()->create();
@@ -82,6 +88,9 @@ class AttendanceRecordTest extends TestCase
             ]);
     }
 
+    /**
+     * 存在しない勤怠を取得した場合に404が返ることを確認する。
+     */
     public function test_nonexistent_attendance_record_returns_404(): void
     {
         $response = $this->getJson(

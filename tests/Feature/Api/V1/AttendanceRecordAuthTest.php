@@ -11,6 +11,9 @@ class AttendanceRecordAuthTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * 未認証ユーザーが勤怠登録APIを利用できないことを確認する。
+     */
     public function test_unauthenticated_user_cannot_create_attendance_record(): void
     {
         $data = [
@@ -27,11 +30,12 @@ class AttendanceRecordAuthTest extends TestCase
 
         $response
             ->assertStatus(401)
-            ->assertJson([
-                'message' => 'Unauthenticated.',
-            ]);
+            ->assertJson(['message' => 'Unauthenticated.']);
     }
 
+    /**
+     * 未認証ユーザーが勤怠更新APIを利用できないことを確認する。
+     */
     public function test_unauthenticated_user_cannot_update_attendance_record(): void
     {
         $data = [
@@ -48,11 +52,12 @@ class AttendanceRecordAuthTest extends TestCase
 
         $response
             ->assertStatus(401)
-            ->assertJson([
-                'message' => 'Unauthenticated.',
-            ]);
+            ->assertJson(['message' => 'Unauthenticated.']);
     }
 
+    /**
+     * 未認証ユーザーが勤怠削除APIを利用できないことを確認する。
+     */
     public function test_unauthenticated_user_cannot_delete_attendance_record(): void
     {
         $response = $this->deleteJson(
@@ -61,11 +66,12 @@ class AttendanceRecordAuthTest extends TestCase
 
         $response
             ->assertStatus(401)
-            ->assertJson([
-                'message' => 'Unauthenticated.',
-            ]);
+            ->assertJson(['message' => 'Unauthenticated.']);
     }
 
+    /**
+     * 認証済みユーザーが自身の勤怠を更新できることを確認する。
+     */
     public function test_authenticated_user_can_update_own_attendance_record(): void
     {
         $user = User::factory()->create();
@@ -96,6 +102,9 @@ class AttendanceRecordAuthTest extends TestCase
             ->assertJsonPath('data.id', $attendanceRecord->id);
     }
 
+    /**
+     * 認証済みユーザーが自身の勤怠を削除できることを確認する。
+     */
     public function test_authenticated_user_can_delete_own_attendance_record(): void
     {
         $user = User::factory()->create();
@@ -120,6 +129,9 @@ class AttendanceRecordAuthTest extends TestCase
         ]);
     }
 
+    /**
+     * 一般ユーザーが他ユーザーの勤怠を更新できないことを確認する。
+     */
     public function test_user_cannot_update_another_users_attendance_record(): void
     {
         $user = User::factory()->create();
@@ -153,6 +165,9 @@ class AttendanceRecordAuthTest extends TestCase
             ]);
     }
 
+    /**
+     * 一般ユーザーが他ユーザーの勤怠を削除できないことを確認する。
+     */
     public function test_user_cannot_delete_another_users_attendance_record(): void
     {
         $user = User::factory()->create();
