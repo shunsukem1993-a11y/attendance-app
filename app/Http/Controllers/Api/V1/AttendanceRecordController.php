@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\StoreAttendanceRecordRequest;
 use App\Http\Requests\Api\V1\UpdateAttendanceRecordRequest;
 use App\Http\Resources\AttendanceRecordResource;
 use App\Models\AttendanceRecord;
+use App\Services\AttendanceTimeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -20,13 +21,15 @@ class AttendanceRecordController extends Controller
      * 指定されたユーザー、日付、月で勤怠情報を絞り込み、
      * ページネーション付きで返す。
      */
-    public function index(IndexAttendanceRecordRequest $request): AnonymousResourceCollection
-    {
+    public function index(
+        IndexAttendanceRecordRequest $request,
+        AttendanceTimeService $attendanceTimeService
+    ): AnonymousResourceCollection {
         $validated = $request->validated();
 
         $perPage = $validated['per_page'] ?? 20;
 
-        $attendanceRecords = AttendanceRecord::with(['user', 'breaks'])
+        $attendanceRecords = AttendanceRecord::with('user')
             ->when(
                 $validated['user_id'] ?? null,
                 function ($query, $userId) {
@@ -48,21 +51,60 @@ class AttendanceRecordController extends Controller
             ->latest('date')
             ->paginate($perPage);
 
+        $attendanceRecords->getCollection()->transform(
+            function (AttendanceRecord $attendanceRecord) use (
+                $attendanceTimeService
+            ): AttendanceRecord {
+                $totalBreakTime = $attendanceTimeService
+                    ->calculateTotalBreakTime($attendanceRecord);
+
+                $totalTime = $attendanceTimeService
+                    ->calculateTotalWorkTime(
+                        $attendanceRecord,
+                        $totalBreakTime
+                    );
+
+                $attendanceRecord->setAttribute(
+                    'total_break_time',
+                    $totalBreakTime
+                );
+
+                $attendanceRecord->setAttribute(
+                    'total_time',
+                    $totalTime
+                );
+
+                $attendanceRecord->unsetRelation('breaks');
+
+                return $attendanceRecord;
+            }
+        );
+
         return AttendanceRecordResource::collection($attendanceRecords);
     }
 
     /**
      * 指定された勤怠の詳細を取得する。
      */
-    public function show(AttendanceRecord $attendanceRecord): AttendanceRecordResource
-    {
+    public function show(
+        AttendanceRecord $attendanceRecord
+    ): JsonResponse {
         $attendanceRecord->load([
             'user',
             'breaks',
-            'correctionRequests',
+            'applications',
         ]);
 
-        return new AttendanceRecordResource($attendanceRecord);
+        $resource = new AttendanceRecordResource($attendanceRecord);
+
+        $data = $resource->response()->getData(true);
+
+        unset(
+            $data['data']['total_time'],
+            $data['data']['total_break_time']
+        );
+
+        return response()->json($data);
     }
 
     /**
