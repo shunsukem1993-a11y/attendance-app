@@ -37,4 +37,17 @@ Route::prefix('v1')->group(function () {
         '/attendance-records',
         [AttendanceRecordController::class, 'store']
     );
+
+    // 勤怠更新API(Sanctum認証済みユーザーのみ)
+    Route::middleware('auth:sanctum')->match(
+        ['put', 'patch'],
+        '/attendance-records/{attendanceRecord}',
+        [AttendanceRecordController::class, 'update']
+    );
+
+    // 勤怠削除API(Sanctum認証済みユーザーのみ)
+    Route::middleware('auth:sanctum')->delete(
+        '/attendance-records/{attendanceRecord}',
+        [AttendanceRecordController::class, 'destroy']
+    );
 });

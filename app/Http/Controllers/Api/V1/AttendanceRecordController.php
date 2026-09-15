@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\IndexAttendanceRecordRequest;
 use App\Http\Requests\Api\V1\StoreAttendanceRecordRequest;
+use App\Http\Requests\Api\V1\UpdateAttendanceRecordRequest;
 use App\Http\Resources\AttendanceRecordResource;
 use App\Models\AttendanceRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class AttendanceRecordController extends Controller
 {
@@ -83,5 +85,36 @@ class AttendanceRecordController extends Controller
         return (new AttendanceRecordResource($attendanceRecord))
             ->response()
             ->setStatusCode(201);
+    }
+
+    /**
+     * 指定された勤怠情報を更新する。
+     */
+    public function update(
+        UpdateAttendanceRecordRequest $request,
+        AttendanceRecord $attendanceRecord
+    ): AttendanceRecordResource {
+        $this->authorize('update', $attendanceRecord);
+
+        $attendanceRecord->update($request->validated());
+
+        $attendanceRecord->load([
+            'user',
+            'breaks',
+        ]);
+
+        return new AttendanceRecordResource($attendanceRecord);
+    }
+
+    /**
+     * 指定された勤怠情報を削除する。
+     */
+    public function destroy(AttendanceRecord $attendanceRecord): Response
+    {
+        $this->authorize('delete', $attendanceRecord);
+
+        $attendanceRecord->delete();
+
+        return response()->noContent();
     }
 }
