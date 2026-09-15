@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\IndexAttendanceRecordRequest;
+use App\Http\Requests\Api\V1\StoreAttendanceRecordRequest;
 use App\Http\Resources\AttendanceRecordResource;
 use App\Models\AttendanceRecord;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AttendanceRecordController extends Controller
@@ -45,5 +47,41 @@ class AttendanceRecordController extends Controller
             ->paginate($perPage);
 
         return AttendanceRecordResource::collection($attendanceRecords);
+    }
+
+    /**
+     * 指定された勤怠の詳細を取得する。
+     */
+    public function show(AttendanceRecord $attendanceRecord): AttendanceRecordResource
+    {
+        $attendanceRecord->load([
+            'user',
+            'breaks',
+            'correctionRequests',
+        ]);
+
+        return new AttendanceRecordResource($attendanceRecord);
+    }
+
+    /**
+     * 勤怠情報を新規作成する。
+     */
+    public function store(
+        StoreAttendanceRecordRequest $request
+    ): JsonResponse {
+        $validated = $request->validated();
+
+        $attendanceRecord = $request->user()
+            ->attendanceRecords()
+            ->create($validated);
+
+        $attendanceRecord->load([
+            'user',
+            'breaks',
+        ]);
+
+        return (new AttendanceRecordResource($attendanceRecord))
+            ->response()
+            ->setStatusCode(201);
     }
 }

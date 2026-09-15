@@ -15,16 +15,22 @@ class AttendanceRecordResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totalBreakSeconds = $this->breaks
-            ->filter(function ($break): bool {
-                return $break->break_in && $break->break_out;
-            })
-            ->sum(function ($break): int {
-                $breakIn = Carbon::parse($break->break_in);
-                $breakOut = Carbon::parse($break->break_out);
+        $totalBreakSeconds = $this->whenLoaded(
+            'breaks',
+            function (): int {
+                return $this->breaks
+                    ->filter(function ($break): bool {
+                        return $break->break_in && $break->break_out;
+                    })
+                    ->sum(function ($break): int {
+                        $breakIn = Carbon::parse($break->break_in);
+                        $breakOut = Carbon::parse($break->break_out);
 
-                return $breakIn->diffInSeconds($breakOut);
-            });
+                        return $breakIn->diffInSeconds($breakOut);
+                    });
+            },
+            0
+        );
 
         $totalTime = null;
 
@@ -45,7 +51,10 @@ class AttendanceRecordResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user_name' => $this->user->name,
+            'user_name' => $this->whenLoaded(
+                'user',
+                fn (): string => $this->user->name
+            ),
             'date' => $this->date,
             'clock_in' => $this->clock_in,
             'clock_out' => $this->clock_out,
@@ -54,6 +63,10 @@ class AttendanceRecordResource extends JsonResource
                 '%02d:%02d',
                 intdiv($totalBreakSeconds, 3600),
                 intdiv($totalBreakSeconds % 3600, 60)
+            ),
+            'breaks' => $this->whenLoaded('breaks'),
+            'applications' => $this->whenLoaded(
+                'correctionRequests'
             ),
             'comment' => $this->comment,
         ];
