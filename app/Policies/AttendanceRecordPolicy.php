@@ -36,7 +36,7 @@ class AttendanceRecordPolicy
      */
     public function update(User $user, AttendanceRecord $attendanceRecord): bool
     {
-        //
+        return $user->id === $attendanceRecord->user_id;
     }
 
     /**
@@ -45,8 +45,7 @@ class AttendanceRecordPolicy
     public function delete(User $user, AttendanceRecord $attendanceRecord): bool
     {
 
-        return $user->admin_status
-            || $user->id === $attendanceRecord->user_id;
+        return $user->id === $attendanceRecord->user_id;
     }
 
     /**
@@ -63,5 +62,17 @@ class AttendanceRecordPolicy
     public function forceDelete(User $user, AttendanceRecord $attendanceRecord): bool
     {
         //
+    }
+
+    /**
+     * 管理者の場合はすべての操作を許可する。
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->admin_status) {
+            return true;
+        }
+
+        return null;
     }
 }
