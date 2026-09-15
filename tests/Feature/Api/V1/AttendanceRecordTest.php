@@ -68,12 +68,13 @@ class AttendanceRecordTest extends TestCase
                 'data' => [
                     'id',
                     'user_id',
-                    'user_name',
+                    'user' => [
+                        'id',
+                        'name',
+                    ],
                     'date',
                     'clock_in',
                     'clock_out',
-                    'total_time',
-                    'total_break_time',
                     'breaks',
                     'applications',
                     'comment',

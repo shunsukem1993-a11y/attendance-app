@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,58 +14,22 @@ class AttendanceRecordResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totalBreakSeconds = $this->whenLoaded(
-            'breaks',
-            function (): int {
-                return $this->breaks
-                    ->filter(function ($break): bool {
-                        return $break->break_in && $break->break_out;
-                    })
-                    ->sum(function ($break): int {
-                        $breakIn = Carbon::parse($break->break_in);
-                        $breakOut = Carbon::parse($break->break_out);
-
-                        return $breakIn->diffInSeconds($breakOut);
-                    });
-            },
-            0
-        );
-
-        $totalTime = null;
-
-        if ($this->clock_in && $this->clock_out) {
-            $clockIn = Carbon::parse($this->clock_in);
-            $clockOut = Carbon::parse($this->clock_out);
-
-            $workSeconds = $clockIn->diffInSeconds($clockOut)
-                - $totalBreakSeconds;
-
-            $totalTime = sprintf(
-                '%02d:%02d',
-                intdiv($workSeconds, 3600),
-                intdiv($workSeconds % 3600, 60)
-            );
-        }
-
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user_name' => $this->whenLoaded(
-                'user',
-                fn (): string => $this->user->name
+            'user' => UserResource::make(
+                $this->whenLoaded('user')
             ),
             'date' => $this->date,
             'clock_in' => $this->clock_in,
             'clock_out' => $this->clock_out,
-            'total_time' => $totalTime,
-            'total_break_time' => sprintf(
-                '%02d:%02d',
-                intdiv($totalBreakSeconds, 3600),
-                intdiv($totalBreakSeconds % 3600, 60)
+            'total_time' => $this->total_time,
+            'total_break_time' => $this->total_break_time,
+            'breaks' => AttendanceBreakResource::collection(
+                $this->whenLoaded('breaks')
             ),
-            'breaks' => $this->whenLoaded('breaks'),
-            'applications' => $this->whenLoaded(
-                'correctionRequests'
+            'applications' => ApplicationResource::collection(
+                $this->whenLoaded('applications')
             ),
             'comment' => $this->comment,
         ];
