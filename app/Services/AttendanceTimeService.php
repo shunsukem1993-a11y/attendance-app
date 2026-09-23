@@ -70,4 +70,35 @@ class AttendanceTimeService
 
         return gmdate('H:i:s', $workSeconds);
     }
+
+    /**
+     * 勤怠の実働時間と休憩時間を計算する。
+     *
+     * @param  AttendanceRecord  $attendanceRecord  対象の勤怠情報
+     * @return AttendanceRecord 計算結果を設定した勤怠情報
+     */
+    public function calculateAttendanceTimes(
+        AttendanceRecord $attendanceRecord
+    ): AttendanceRecord {
+        $totalBreakTime = $this->calculateTotalBreakTime($attendanceRecord);
+
+        $totalTime = $this->calculateTotalWorkTime(
+            $attendanceRecord,
+            $totalBreakTime
+        );
+
+        $attendanceRecord->setAttribute(
+            'total_break_time',
+            $totalBreakTime
+        );
+
+        $attendanceRecord->setAttribute(
+            'total_time',
+            $totalTime
+        );
+
+        $attendanceRecord->unsetRelation('breaks');
+
+        return $attendanceRecord;
+    }
 }

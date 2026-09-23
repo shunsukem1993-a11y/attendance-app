@@ -33,7 +33,9 @@ class AttendanceRecordTest extends TestCase
         $record = AttendanceRecord::where(
             'user_id',
             $user->id
-        )->firstOrFail();
+        )
+            ->latest('date')
+            ->firstOrFail();
 
         $response = $this->getJson(
             '/api/v1/attendance-records'
@@ -43,9 +45,22 @@ class AttendanceRecordTest extends TestCase
             ->assertJsonFragment([
                 'id' => $record->id,
                 'user_id' => $user->id,
+                'user_name' => $user->name,
             ])
             ->assertJsonStructure([
-                'data',
+                'data' => [
+                    '*' => [
+                        'id',
+                        'user_id',
+                        'user_name',
+                        'date',
+                        'clock_in',
+                        'clock_out',
+                        'total_time',
+                        'total_break_time',
+                        'comment',
+                    ],
+                ],
                 'links',
                 'meta' => [
                     'current_page',
@@ -84,11 +99,7 @@ class AttendanceRecordTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'id',
-                    'user_id',
-                    'user' => [
-                        'id',
-                        'name',
-                    ],
+                    'user',
                     'date',
                     'clock_in',
                     'clock_out',
@@ -96,7 +107,38 @@ class AttendanceRecordTest extends TestCase
                     'applications',
                     'comment',
                 ],
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    'user' => [
+                        'id',
+                        'name',
+                    ],
+                ],
             ]);
+    }
+
+    /**
+     * 詳細レスポンスに一覧用の項目が含まれないことを確認する。
+     */
+    public function test_attendance_record_detail_does_not_include_list_only_fields(): void
+    {
+        $user = User::factory()->create();
+
+        $attendanceRecord = AttendanceRecord::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->getJson(
+            "/api/v1/attendance-records/{$attendanceRecord->id}"
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonMissing([
+                'user_id' => $user->id,
+            ])
+            ->assertJsonMissingPath('data.total_time')
+            ->assertJsonMissingPath('data.total_break_time');
     }
 
     /**
