@@ -64,7 +64,7 @@ class AdminAttendanceDetailService
                 : '',
 
             'breaks' => $attendanceRecord->breaks
-                ->map(function (AttendanceBreak $break) {
+                ->map(function (AttendanceBreak $break): array {
                     return [
                         'break_in' => $break->break_in
                             ? Carbon::parse(
@@ -108,11 +108,16 @@ class AdminAttendanceDetailService
         $breakIns = $data['new_break_in'] ?? [];
         $breakOuts = $data['new_break_out'] ?? [];
 
-        foreach ($attendanceRecord->breaks as $index => $break) {
-            $break->update([
-                'break_in' => $breakIns[$index] ?? null,
-                'break_out' => $breakOuts[$index] ?? null,
-            ]);
-        }
+        $attendanceRecord->breaks->each(
+            function (AttendanceBreak $break, int $index) use (
+                $breakIns,
+                $breakOuts
+            ): void {
+                $break->update([
+                    'break_in' => $breakIns[$index] ?? null,
+                    'break_out' => $breakOuts[$index] ?? null,
+                ]);
+            }
+        );
     }
 }

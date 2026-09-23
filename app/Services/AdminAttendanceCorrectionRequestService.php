@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AttendanceBreak;
 use App\Models\AttendanceCorrectionRequest;
+use App\Models\ProposalBreak;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -105,13 +106,15 @@ class AdminAttendanceCorrectionRequestService
         $attendanceRecord->breaks()->delete();
 
         // 申請された休憩情報を勤怠に反映
-        foreach ($application->proposalBreaks as $proposalBreak) {
-            AttendanceBreak::create([
-                'attendance_record_id' => $attendanceRecord->id,
-                'break_in' => $proposalBreak->break_in,
-                'break_out' => $proposalBreak->break_out,
-            ]);
-        }
+        $application->proposalBreaks->each(
+            function (ProposalBreak $proposalBreak) use ($attendanceRecord) {
+                AttendanceBreak::create([
+                    'attendance_record_id' => $attendanceRecord->id,
+                    'break_in' => $proposalBreak->break_in,
+                    'break_out' => $proposalBreak->break_out,
+                ]);
+            }
+        );
 
         // 申請を承認済みに変更
         $application->update([
