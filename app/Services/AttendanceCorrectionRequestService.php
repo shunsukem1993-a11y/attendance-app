@@ -24,7 +24,7 @@ class AttendanceCorrectionRequestService
             ->get()
             ->map(function (
                 AttendanceCorrectionRequest $application
-            ) {
+            ): array {
                 return [
                     'id' => $application->id,
                     'attendance_record_id' => $application->attendance_record_id,

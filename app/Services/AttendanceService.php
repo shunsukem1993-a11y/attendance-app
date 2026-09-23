@@ -39,7 +39,7 @@ class AttendanceService
         }
 
         $activeBreak = $attendanceRecord->breaks
-            ->contains(fn (AttendanceBreak $break) => $break->break_out === null);
+            ->contains(fn (AttendanceBreak $break): bool => $break->break_out === null);
 
         return $activeBreak ? '休憩中' : '出勤中';
     }
@@ -129,12 +129,9 @@ class AttendanceService
             return '本日の勤怠記録がありません。';
         }
 
-        $break = AttendanceBreak::where(
-            'attendance_record_id',
-            $attendanceRecord->id
-        )
+        $break = $attendanceRecord->breaks
             ->whereNull('break_out')
-            ->latest('id')
+            ->sortByDesc('id')
             ->first();
 
         if (! $break) {
@@ -186,6 +183,6 @@ class AttendanceService
     private function hasActiveBreak(AttendanceRecord $attendanceRecord): bool
     {
         return $attendanceRecord->breaks
-            ->contains(fn (AttendanceBreak $break) => $break->break_out === null);
+            ->contains(fn (AttendanceBreak $break): bool => $break->break_out === null);
     }
 }

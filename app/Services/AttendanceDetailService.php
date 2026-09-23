@@ -70,7 +70,7 @@ class AttendanceDetailService
                 : '',
 
             'breaks' => $attendanceRecord->breaks
-                ->map(function (AttendanceBreak $break) {
+                ->map(function (AttendanceBreak $break): array {
                     return [
                         'break_in' => $break->break_in
                             ? Carbon::parse(
