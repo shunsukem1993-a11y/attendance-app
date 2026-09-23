@@ -95,7 +95,10 @@ erDiagram
 
 ## 開発環境URL
 
-http://localhost
+- 開発環境：http://localhost
+- phpMyAdmin：http://localhost:8080
+- Mailpit: http://localhost:8025
+
 
 ## 動作環境
 
@@ -156,21 +159,34 @@ http://localhost
     docker compose down
     ```
 
-4. **Laravel Sailの起動**
+4. **Laravel Sailを導入**
+
+    Laravel Sailを導入し、MySQLとMailpitを使用するように設定します。
+    ```bash
+    docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    php artisan sail:install --with=mysql,mailpit
+    ```
+    ※ Apple Silicon（M1/M2/M3/M4など）の場合は、compose.yamlのMySQLサービスに以下を追加してください。
+
+5. **Laravel Sailの起動**
 
     Dockerコンテナを起動します。
     ```bash
     ./vendor/bin/sail up -d
     ```
 
-5. **アプリケーションキーの生成**
+6. **アプリケーションキーの生成**
 
     Laravelのアプリケーションキーを生成します。
     ```bash
     ./vendor/bin/sail artisan key:generate
     ```
 
-6. **データベースのマイグレーションと初期データ投入**
+7. **データベースのマイグレーションと初期データ投入**
 
     テーブルを作成し、必要に応じてシーダーを実行します。
     ```bash
@@ -181,7 +197,7 @@ http://localhost
     ./vendor/bin/sail artisan migrate
     ```
 
-7. **フロントエンドのビルド**
+8. **フロントエンドのビルド**
 
     Node.jsの依存パッケージをインストールし、開発用ビルドを実行します。
     ```bash
@@ -189,7 +205,7 @@ http://localhost
     ./vendor/bin/sail npm run dev
     ```
 
-8. **アプリケーションへのアクセス**
+9. **アプリケーションへのアクセス**
 
     ブラウザで以下のURLにアクセスします。
     ```bash
@@ -204,8 +220,14 @@ PHPUnitによるテストを実行する場合は、以下のコマンドを実�
 ```
 
 特定のテストファイルのみを実行する場合は、以下のように指定できます。
+```bash
+./vendor/bin/sail artisan test --filter=テストファイル名
+```
 
-テスト実装後記入
+例：
+```bash
+./vendor/bin/sail artisan test --filter=AdminStaffListTest
+```
 
 ## 機能一覧
 
