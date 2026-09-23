@@ -10,7 +10,6 @@ use App\Http\Resources\AttendanceRecordResource;
 use App\Models\AttendanceRecord;
 use App\Services\AttendanceTimeService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class AttendanceRecordController extends Controller
@@ -18,25 +17,22 @@ class AttendanceRecordController extends Controller
     /**
      * 勤怠一覧を取得する。
      *
-     * 指定されたユーザー、日付、月で勤怠情報を絞り込み、
-     * ページネーション付きで返す。
-     *
-     * @param  IndexAttendanceRecordRequest  $request
-     *                                                 勤怠一覧の検索条件を含むリクエスト
-     * @param  AttendanceTimeService  $attendanceTimeService
-     *                                                        勤務時間・休憩時間を計算するサービス
-     * @return AnonymousResourceCollection
-     *                                     勤怠一覧のリソースコレクション
+     * @param  IndexAttendanceRecordRequest  $request  勤怠一覧の検索条件を含むリクエスト
+     * @param  AttendanceTimeService  $attendanceTimeService  勤務時間・休憩時間を計算するサービス
+     * @return JsonResponse 勤怠一覧のJSONレスポンス
      */
     public function index(
         IndexAttendanceRecordRequest $request,
         AttendanceTimeService $attendanceTimeService
-    ): AnonymousResourceCollection {
+    ): JsonResponse {
         $validated = $request->validated();
 
         $perPage = $validated['per_page'] ?? 20;
 
-        $attendanceRecords = AttendanceRecord::with('user')
+        $attendanceRecords = AttendanceRecord::with([
+            'user',
+            'breaks',
+        ])
             ->when(
                 $validated['user_id'] ?? null,
                 function ($query, $userId) {
@@ -59,35 +55,36 @@ class AttendanceRecordController extends Controller
             ->paginate($perPage);
 
         $attendanceRecords->getCollection()->transform(
-            function (AttendanceRecord $attendanceRecord) use (
-                $attendanceTimeService
-            ): AttendanceRecord {
-                $totalBreakTime = $attendanceTimeService
-                    ->calculateTotalBreakTime($attendanceRecord);
-
-                $totalTime = $attendanceTimeService
-                    ->calculateTotalWorkTime(
-                        $attendanceRecord,
-                        $totalBreakTime
-                    );
-
-                $attendanceRecord->setAttribute(
-                    'total_break_time',
-                    $totalBreakTime
+            function (AttendanceRecord $attendanceRecord) use ($attendanceTimeService) {
+                return $attendanceTimeService->calculateAttendanceTimes(
+                    $attendanceRecord
                 );
-
-                $attendanceRecord->setAttribute(
-                    'total_time',
-                    $totalTime
-                );
-
-                $attendanceRecord->unsetRelation('breaks');
-
-                return $attendanceRecord;
             }
         );
 
-        return AttendanceRecordResource::collection($attendanceRecords);
+        $resource = AttendanceRecordResource::collection(
+            $attendanceRecords
+        );
+
+        $data = $resource->response()->getData(true);
+
+        $data['data'] = collect($data['data'])
+            ->map(function ($record) {
+                return [
+                    'id' => $record['id'],
+                    'user_id' => $record['user_id'],
+                    'user_name' => $record['user']['name'] ?? null,
+                    'date' => $record['date'],
+                    'clock_in' => $record['clock_in'],
+                    'clock_out' => $record['clock_out'],
+                    'total_time' => $record['total_time'],
+                    'total_break_time' => $record['total_break_time'],
+                    'comment' => $record['comment'],
+                ];
+            })
+            ->all();
+
+        return response()->json($data);
     }
 
     /**
@@ -111,7 +108,8 @@ class AttendanceRecordController extends Controller
 
         unset(
             $data['data']['total_time'],
-            $data['data']['total_break_time']
+            $data['data']['total_break_time'],
+            $data['data']['user_id']
         );
 
         return response()->json($data);
@@ -120,10 +118,8 @@ class AttendanceRecordController extends Controller
     /**
      * 勤怠情報を新規作成する。
      *
-     * @param  StoreAttendanceRecordRequest  $request
-     *                                                 新規勤怠情報を含むリクエスト
-     * @return JsonResponse
-     *                      作成された勤怠情報のJSONレスポンス
+     * @param  StoreAttendanceRecordRequest  $request  新規勤怠情報を含むリクエスト
+     * @return JsonResponse 作成された勤怠情報のJSONレスポンス
      */
     public function store(
         StoreAttendanceRecordRequest $request
@@ -147,12 +143,9 @@ class AttendanceRecordController extends Controller
     /**
      * 指定された勤怠情報を更新する。
      *
-     * @param  UpdateAttendanceRecordRequest  $request
-     *                                                  更新する勤怠情報を含むリクエスト
-     * @param  AttendanceRecord  $attendanceRecord
-     *                                              更新対象の勤怠情報
-     * @return AttendanceRecordResource
-     *                                  更新された勤怠情報のリソース
+     * @param  UpdateAttendanceRecordRequest  $request  更新する勤怠情報を含むリクエスト
+     * @param  AttendanceRecord  $attendanceRecord  更新対象の勤怠情報
+     * @return AttendanceRecordResource 更新された勤怠情報のリソース
      */
     public function update(
         UpdateAttendanceRecordRequest $request,
@@ -173,10 +166,8 @@ class AttendanceRecordController extends Controller
     /**
      * 指定された勤怠情報を削除する。
      *
-     * @param  AttendanceRecord  $attendanceRecord
-     *                                              削除対象の勤怠情報
-     * @return Response
-     *                  削除成功時の空レスポンス
+     * @param  AttendanceRecord  $attendanceRecord  削除対象の勤怠情報
+     * @return Response 削除成功時の空レスポンス
      */
     public function destroy(AttendanceRecord $attendanceRecord): Response
     {
