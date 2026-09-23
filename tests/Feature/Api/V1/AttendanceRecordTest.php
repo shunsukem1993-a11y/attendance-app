@@ -6,6 +6,8 @@ use App\Models\AttendanceBreak;
 use App\Models\AttendanceCorrectionRequest;
 use App\Models\AttendanceRecord;
 use App\Models\User;
+use Database\Seeders\AttendanceRecordSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,11 +20,20 @@ class AttendanceRecordTest extends TestCase
      */
     public function test_attendance_records_can_be_listed(): void
     {
-        $user = User::factory()->create();
-
-        $records = AttendanceRecord::factory()->count(3)->create([
-            'user_id' => $user->id,
+        $this->seed([
+            UserSeeder::class,
+            AttendanceRecordSeeder::class,
         ]);
+
+        $user = User::where(
+            'email',
+            'user1@example.com'
+        )->firstOrFail();
+
+        $record = AttendanceRecord::where(
+            'user_id',
+            $user->id
+        )->firstOrFail();
 
         $response = $this->getJson(
             '/api/v1/attendance-records'
@@ -30,7 +41,7 @@ class AttendanceRecordTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonFragment([
-                'id' => $records[0]->id,
+                'id' => $record->id,
                 'user_id' => $user->id,
             ])
             ->assertJsonStructure([

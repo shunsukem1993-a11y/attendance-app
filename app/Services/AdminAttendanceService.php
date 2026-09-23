@@ -11,13 +11,13 @@ use Illuminate\Support\Collection;
 class AdminAttendanceService
 {
     /**
-     * 全ユーザーを取得する。
+     * 一般ユーザーを取得する。
      *
      * @return Collection<int, User> ユーザーのCollection
      */
     public function getUsers(): Collection
     {
-        return User::all();
+        return User::where('admin_status', false)->get();
     }
 
     /**

@@ -17,6 +17,10 @@ class AttendanceRecordSeeder extends Seeder
         $users = User::all();
 
         foreach ($users as $user) {
+            if ($user->admin_status) {
+                continue;
+            }
+
             if ($user->email === 'user1@example.com') {
                 $this->createUser1Records($user);
             } else {
