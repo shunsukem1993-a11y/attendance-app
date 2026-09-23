@@ -12,7 +12,7 @@ class AdminAttendanceListTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * 管理者がその日の全ユーザーの勤怠情報を確認できる
+     * 管理者がその日の全一般ユーザーの勤怠情報を確認できる
      */
     public function test_admin_can_see_all_users_attendance_records(): void
     {
@@ -24,14 +24,6 @@ class AdminAttendanceListTest extends TestCase
 
         $user2 = User::factory()->create([
             'admin_status' => false,
-        ]);
-
-        // 管理者の勤怠
-        AttendanceRecord::factory()->create([
-            'user_id' => $admin->id,
-            'date' => now()->toDateString(),
-            'clock_in' => '08:00:00',
-            'clock_out' => '17:00:00',
         ]);
 
         // 一般ユーザー1の勤怠
@@ -55,13 +47,10 @@ class AdminAttendanceListTest extends TestCase
         $response->assertStatus(200);
 
         // 全ユーザーが表示されること
-        $response->assertSee($admin->name);
         $response->assertSee($user1->name);
         $response->assertSee($user2->name);
 
         // 勤怠時間が表示されること
-        $response->assertSee('08:00');
-        $response->assertSee('17:00');
         $response->assertSee('09:00');
         $response->assertSee('18:00');
         $response->assertSee('10:00');
