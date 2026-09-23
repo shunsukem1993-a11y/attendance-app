@@ -23,7 +23,7 @@ class AttendanceDetailService
     ): AttendanceRecord {
         return AttendanceRecord::with([
             'breaks',
-            'correctionRequests',
+            'applications',
         ])
             ->where('id', $id)
             ->where('user_id', $user->id)
@@ -42,7 +42,7 @@ class AttendanceDetailService
         return [
             'id' => $attendanceRecord->id,
 
-            'application' => $attendanceRecord->correctionRequests
+            'application' => $attendanceRecord->applications
                 ->where(
                     'approval_status',
                     AttendanceCorrectionRequest::STATUS_PENDING

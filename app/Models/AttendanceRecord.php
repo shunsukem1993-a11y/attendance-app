@@ -44,11 +44,6 @@ class AttendanceRecord extends Model
      *
      * @return HasMany AttendanceCorrectionRequestとのリレーション
      */
-    public function correctionRequests(): HasMany
-    {
-        return $this->hasMany(AttendanceCorrectionRequest::class);
-    }
-
     public function applications(): HasMany
     {
         return $this->hasMany(AttendanceCorrectionRequest::class);

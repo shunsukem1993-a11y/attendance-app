@@ -19,7 +19,7 @@ class AdminAttendanceDetailService
     {
         return AttendanceRecord::with([
             'breaks',
-            'correctionRequests',
+            'applications',
             'user',
         ])->findOrFail($id);
     }
@@ -36,7 +36,7 @@ class AdminAttendanceDetailService
         return [
             'id' => $attendanceRecord->id,
 
-            'application' => $attendanceRecord->correctionRequests
+            'application' => $attendanceRecord->applications
                 ->where(
                     'approval_status',
                     AttendanceCorrectionRequest::STATUS_PENDING
