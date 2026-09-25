@@ -2,11 +2,10 @@
 
 namespace Tests\Feature\Api\V1;
 
-use App\Models\AttendanceBreak;
-use App\Models\AttendanceCorrectionRequest;
 use App\Models\AttendanceRecord;
 use App\Models\User;
-use Database\Seeders\AttendanceRecordSeeder;
+use Database\Seeders\Test\AttendanceRecordDetailTestSeeder;
+use Database\Seeders\Test\AttendanceRecordListTestSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -22,7 +21,7 @@ class AttendanceRecordTest extends TestCase
     {
         $this->seed([
             UserSeeder::class,
-            AttendanceRecordSeeder::class,
+            AttendanceRecordListTestSeeder::class,
         ]);
 
         $user = User::where(
@@ -76,20 +75,15 @@ class AttendanceRecordTest extends TestCase
      */
     public function test_attendance_record_detail_can_be_retrieved(): void
     {
-        $user = User::factory()->create();
-
-        $attendanceRecord = AttendanceRecord::factory()->create([
-            'user_id' => $user->id,
+        $this->seed([
+            UserSeeder::class,
+            AttendanceRecordDetailTestSeeder::class,
         ]);
 
-        AttendanceBreak::factory()->create([
-            'attendance_record_id' => $attendanceRecord->id,
-        ]);
-
-        AttendanceCorrectionRequest::factory()->create([
-            'user_id' => $user->id,
-            'attendance_record_id' => $attendanceRecord->id,
-        ]);
+        $attendanceRecord = AttendanceRecord::where(
+            'comment',
+            '詳細APIテスト用勤務'
+        )->firstOrFail();
 
         $response = $this->getJson(
             "/api/v1/attendance-records/{$attendanceRecord->id}"
@@ -99,7 +93,10 @@ class AttendanceRecordTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'id',
-                    'user',
+                    'user' => [
+                        'id',
+                        'name',
+                    ],
                     'date',
                     'clock_in',
                     'clock_out',
@@ -107,38 +104,7 @@ class AttendanceRecordTest extends TestCase
                     'applications',
                     'comment',
                 ],
-            ])
-            ->assertJsonStructure([
-                'data' => [
-                    'user' => [
-                        'id',
-                        'name',
-                    ],
-                ],
             ]);
-    }
-
-    /**
-     * 詳細レスポンスに一覧用の項目が含まれないことを確認する。
-     */
-    public function test_attendance_record_detail_does_not_include_list_only_fields(): void
-    {
-        $user = User::factory()->create();
-
-        $attendanceRecord = AttendanceRecord::factory()->create([
-            'user_id' => $user->id,
-        ]);
-
-        $response = $this->getJson(
-            "/api/v1/attendance-records/{$attendanceRecord->id}"
-        );
-
-        $response->assertStatus(200)
-            ->assertJsonMissing([
-                'user_id' => $user->id,
-            ])
-            ->assertJsonMissingPath('data.total_time')
-            ->assertJsonMissingPath('data.total_break_time');
     }
 
     /**

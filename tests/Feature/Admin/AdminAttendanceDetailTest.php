@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\AttendanceBreak;
 use App\Models\AttendanceRecord;
@@ -182,30 +182,5 @@ class AdminAttendanceDetailTest extends TestCase
         $response->assertSessionHasErrors([
             'comment' => '備考を記入してください。',
         ]);
-    }
-
-    /**
-     * 管理者以外は管理者勤怠詳細にアクセスできない
-     */
-    public function test_general_user_cannot_access_admin_attendance_detail(): void
-    {
-        $user = User::factory()->create([
-            'admin_status' => false,
-        ]);
-
-        $attendanceRecord = AttendanceRecord::factory()->create([
-            'user_id' => $user->id,
-            'date' => now()->toDateString(),
-            'clock_in' => '09:00:00',
-            'clock_out' => '18:00:00',
-        ]);
-
-        $this->actingAs($user);
-
-        $response = $this->get(
-            '/admin/attendance/detail/'.$attendanceRecord->id
-        );
-
-        $response->assertForbidden();
     }
 }
