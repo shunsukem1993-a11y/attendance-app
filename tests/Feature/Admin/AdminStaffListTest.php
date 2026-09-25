@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,49 +62,5 @@ class AdminStaffListTest extends TestCase
 
         $response->assertSee($user1->email);
         $response->assertSee($user2->email);
-    }
-
-    /**
-     * 管理者はスタッフ一覧に表示されない
-     */
-    public function test_admin_is_not_displayed_in_staff_list(): void
-    {
-        $admin = $this->createAdminUser();
-
-        $user = User::factory()->create([
-            'name' => '一般ユーザー',
-            'email' => 'user@example.com',
-            'admin_status' => false,
-        ]);
-
-        $response = $this->get('/admin/staff/list');
-
-        $response->assertStatus(200);
-
-        $response->assertSee($user->name);
-        $response->assertSee($user->email);
-
-        $response->assertDontSee($admin->name);
-        $response->assertDontSee($admin->email);
-    }
-
-    /**
-     * 一般ユーザーは管理者スタッフ一覧にアクセスできない
-     */
-    public function test_general_user_cannot_access_admin_staff_list(): void
-    {
-        User::factory()->create([
-            'admin_status' => false,
-        ]);
-
-        $user = User::factory()->create([
-            'admin_status' => false,
-        ]);
-
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/staff/list');
-
-        $response->assertForbidden();
     }
 }

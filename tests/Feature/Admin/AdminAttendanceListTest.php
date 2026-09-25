@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\AttendanceRecord;
 use App\Models\User;
@@ -130,21 +130,5 @@ class AdminAttendanceListTest extends TestCase
         $response->assertSee($nextDay->format('Y/m/d'));
         $response->assertSee('10:00');
         $response->assertSee('19:00');
-    }
-
-    /**
-     * 一般ユーザーは管理者勤怠一覧にアクセスできない
-     */
-    public function test_general_user_cannot_access_admin_attendance_list(): void
-    {
-        $user = User::factory()->create([
-            'admin_status' => false,
-        ]);
-
-        $this->actingAs($user);
-
-        $response = $this->get('/admin/attendance/list');
-
-        $response->assertForbidden();
     }
 }

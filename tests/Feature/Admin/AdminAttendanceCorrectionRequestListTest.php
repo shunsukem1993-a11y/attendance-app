@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin;
 
 use App\Models\AttendanceCorrectionRequest;
 use App\Models\AttendanceRecord;
