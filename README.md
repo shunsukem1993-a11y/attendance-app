@@ -140,11 +140,7 @@ erDiagram
 
 3. **Composer依存パッケージのインストール**
 
-    コンテナを起動します。
-    ```bash
-    docker compose up -d
-    ```
-    Laravelコンテナ内でComposerを実行し、Composerで依存パッケージをインストールします。
+    Composerで依存パッケージをインストールします。
     ```bash
     docker run --rm \
     -u "$(id -u):$(id -g)" \
@@ -154,50 +150,29 @@ erDiagram
     laravelsail/php82-composer:latest \
     composer install --ignore-platform-reqs
     ```
-    コンテナを停止します。
-    ```bash
-    docker compose down
-    ```
 
-4. **Laravel Sailを導入**
-
-    Laravel Sailを導入し、MySQLとMailpitを使用するように設定します。
-    ```bash
-    docker run --rm \
-    -u "$(id -u):$(id -g)" \
-    -v "$(pwd):/var/www/html" \
-    -w /var/www/html \
-    laravelsail/php82-composer:latest \
-    php artisan sail:install --with=mysql,mailpit
-    ```
-    ※ Apple Silicon（M1/M2/M3/M4など）の場合は、compose.yamlのMySQLサービスに以下を追加してください。
-
-5. **Laravel Sailの起動**
+4. **Laravel Sailの起動**
 
     Dockerコンテナを起動します。
     ```bash
     ./vendor/bin/sail up -d
     ```
 
-6. **アプリケーションキーの生成**
+5. **アプリケーションキーの生成**
 
     Laravelのアプリケーションキーを生成します。
     ```bash
     ./vendor/bin/sail artisan key:generate
     ```
 
-7. **データベースのマイグレーションと初期データ投入**
+6. **データベースのマイグレーションと初期データ投入**
 
-    テーブルを作成し、必要に応じてシーダーを実行します。
+    テーブルを作成し、シーダーを実行します。
     ```bash
     ./vendor/bin/sail artisan migrate --seed
     ```
-    ※シーダーを使用していない場合は、以下を実行してください。
-    ```bash
-    ./vendor/bin/sail artisan migrate
-    ```
 
-8. **フロントエンドのビルド**
+7. **フロントエンドのビルド**
 
     Node.jsの依存パッケージをインストールし、開発用ビルドを実行します。
     ```bash
@@ -205,7 +180,7 @@ erDiagram
     ./vendor/bin/sail npm run dev
     ```
 
-9. **アプリケーションへのアクセス**
+8. **アプリケーションへのアクセス**
 
     ブラウザで以下のURLにアクセスします。
     ```bash
